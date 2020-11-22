@@ -1,2 +1,3 @@
 PySide2
 lorem
+qdarkstyle
