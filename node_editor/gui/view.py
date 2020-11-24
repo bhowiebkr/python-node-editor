@@ -14,6 +14,8 @@ class View(QtWidgets.QGraphicsView):
 
     _mouse_wheel_zoom_rate = 0.0015
 
+    request_node = QtCore.Signal(str)
+
     def __init__(self, parent):
         super(View, self).__init__(parent)
         self.setRenderHint(QtGui.QPainter.Antialiasing)
@@ -23,9 +25,10 @@ class View(QtWidgets.QGraphicsView):
         gl_format.setSamples(10)
         gl_widget = QtOpenGL.QGLWidget(gl_format)
 
+        self.currentScale = 1
         self._pan = False
-        self._panStartX = 0
-        self._panStartY = 0
+        self._pan_start_x = 0
+        self._pan_start_y = 0
         self._numScheduledScalings = 0
         self.lastMousePos = QtCore.QPoint()
 
@@ -37,10 +40,6 @@ class View(QtWidgets.QGraphicsView):
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
 
-    def toggleDragMode(self):
-        if self.dragMode() == QtWidgets.QGraphicsView.ScrollHandDrag:
-            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
-
     def wheelEvent(self, event):
         num_degrees = event.delta() / 8.0
         num_steps = num_degrees / 5.0
@@ -50,8 +49,8 @@ class View(QtWidgets.QGraphicsView):
         if self._numScheduledScalings * num_steps < 0:
             self._numScheduledScalings = num_steps
 
-        self.anim = QtCore.QTimeLine(100)
-        self.anim.setUpdateInterval(2)
+        self.anim = QtCore.QTimeLine(350)
+        self.anim.setUpdateInterval(20)
 
         self.anim.valueChanged.connect(self.scaling_time)
         self.anim.finished.connect(self.anim_finished)
@@ -59,6 +58,9 @@ class View(QtWidgets.QGraphicsView):
 
     def scaling_time(self, x):
         factor = 1.0 + self._numScheduledScalings / 300.0
+
+        self.currentScale *= factor
+
         self.scale(factor, factor)
 
     def anim_finished(self):
@@ -124,9 +126,52 @@ class View(QtWidgets.QGraphicsView):
 
         if item:
             if isinstance(item, Connection):
-                # print(type(item))
-                # if item.type() == Connection.Type:
+
                 print("Found Connection", item)
                 elbow_action = QtWidgets.QAction("Add Elbow", self)
                 elbow_action.triggered.connect(self.add_elbow)
                 self.menu.addAction(elbow_action)
+
+    def dragEnterEvent(self, e):
+
+        if e.mimeData().hasFormat("text/plain"):
+            e.accept()
+        else:
+            e.ignore()
+
+    def dropEvent(self, e):
+        drop_node_name = e.mimeData().text()
+        self.request_node.emit(drop_node_name)
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.MiddleButton:
+            self._pan = True
+            self._pan_start_x = event.x()
+            self._pan_start_y = event.y()
+            self.setCursor(QtCore.Qt.ClosedHandCursor)
+
+        return super(View, self).mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.MiddleButton:
+            self._pan = False
+            self.setCursor(QtCore.Qt.ArrowCursor)
+
+        return super(View, self).mouseReleaseEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self._pan:
+
+            self.horizontalScrollBar().setValue(
+                self.horizontalScrollBar().value() - (event.x() - self._pan_start_x)
+            )
+
+            self.verticalScrollBar().setValue(
+                self.verticalScrollBar().value() - (event.y() - self._pan_start_y)
+            )
+
+            self._pan_start_x = event.x()
+            self._pan_start_y = event.y()
+
+        return super(View, self).mouseMoveEvent(event)
+
