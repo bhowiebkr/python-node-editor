@@ -84,7 +84,10 @@ class Connection(QtWidgets.QGraphicsPathItem):
         and :py:attr:`Connection.pos2` attributes.
         """
         self.pos1 = self.m_port1.scenePos()
-        self.pos2 = self.m_port2.scenePos()
+
+        # if we are pulling off an exiting connection we skip code below
+        if self.m_port2:
+            self.pos2 = self.m_port2.scenePos()
 
     def update_path(self):
         """
