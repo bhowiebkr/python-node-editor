@@ -1,6 +1,6 @@
-# Simple Node Editor
+# Logic Node Editor
 
-Simple node editor is just that. Very basic minimal code for implementing a node graph or editor using PySide2. All nodes are built using QGraphics items.
+A very basic minimal code for implementing a node graph or editor using PySide2. In this case we are building with logic nodes. All nodes are built using QGraphics items.
 
 Example video: https://www.youtube.com/watch?v=DOsFJ8lm9dU
 
