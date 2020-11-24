@@ -26,6 +26,22 @@ class Node(QtWidgets.QGraphicsPathItem):
         self.horizontal_margin = 30  # horizontal margin
         self.vertical_margin = 15  # vertical margin
 
+    @property
+    def title(self):
+        return self._title_text
+
+    @title.setter
+    def title(self, title):
+        self._title_text = title
+
+    @property
+    def type_text(self):
+        return self._type_text
+
+    @type_text.setter
+    def type_text(self, type_text):
+        self._type_text = type_text
+
     def paint(self, painter, option=None, widget=None):
         if self.isSelected():
             painter.setPen(QtGui.QPen(QtGui.QColor(241, 175, 0), 2))
@@ -146,3 +162,44 @@ class Node(QtWidgets.QGraphicsPathItem):
                 connection._do_highlight = value
                 connection.update_path()
 
+    def contextMenuEvent(self, event):
+        menu = QtWidgets.QMenu(self)
+        pos = event.pos()
+
+        # actions
+        delete_node = QtWidgets.QAction("Delete Node")
+        edit_node = QtWidgets.QAction("Edit Node")
+        menu.addAction(delete_node)
+
+        action = menu.exec_(self.mapToGlobal(pos))
+
+        if action == delete_node:
+            item_name = self.selectedItems()[0].text()
+
+            if item_name not in ["And", "Not", "Input", "Output"]:
+                print(f"delete node: {item_name}")
+            else:
+                print("Cannot delete default nodes")
+
+        elif action == edit_node:
+            print("editing node")
+
+            # confirm to open in the editor replacing what is existing
+
+    def delete(self):
+        """Delete the connection.
+        Remove any found connections ports by calling :any:`Port.remove_connection`.  After connections
+        have been removed set the stored :any:`Port` to None. Lastly call :any:`QGraphicsScene.removeItem`
+        on the scene to remove this widget.
+        """
+
+        to_delete = []
+
+        for port in self._ports:
+            for connection in port.connections():
+                to_delete.append(connection)
+
+        for connection in to_delete:
+            connection.delete()
+
+        self.scene().removeItem(self)
