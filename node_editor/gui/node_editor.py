@@ -21,13 +21,17 @@ class NodeEditor(QtCore.QObject):
             QtCore.QRectF(position - QtCore.QPointF(1, 1), QtCore.QSizeF(3, 3))
         )
 
-        for item in items:
-            return item
-
-            if item.type() > QtWidgets.QGraphicsItem.UserType:
-                return item
-
+        if items:
+            return items[0]
         return None
+
+        # for item in items:
+        #     return item
+
+        #     # if item.type() > QtWidgets.QGraphicsItem.UserType:
+        #     #     return item
+
+        # return None
 
     def eventFilter(self, watched, event):
         if type(event) == QtWidgets.QWidgetItem:
@@ -44,6 +48,15 @@ class NodeEditor(QtCore.QObject):
                     self.connection.set_port_1(item)
                     self.connection.set_pos_1(item.scenePos())
                     self.connection.set_pos_2(event.scenePos())
+                    self.connection.update_path()
+                    return True
+
+                elif isinstance(item, Connection):
+                    self.connection = Connection(None)
+                    self.scene.addItem(self.connection)
+                    self.connection.set_port_1(item.port1())
+                    self.connection.set_pos_2(event.scenePos())
+                    self.connection.update_pos_from_ports()  # to fix the offset
                     self.connection.update_path()
                     return True
 
@@ -68,16 +81,17 @@ class NodeEditor(QtCore.QObject):
                     self._last_selected = None
 
             elif event.button() == QtCore.Qt.RightButton:
+                # context menu
                 pass
 
         elif event.type() == QtCore.QEvent.KeyPress:
             if event.key() == QtCore.Qt.Key_Delete:
 
                 for item in self.scene.selectedItems():
-                    if item.type() == Connection.Type:
+
+                    if isinstance(item, (Connection, Node)):
                         item.delete()
-                    elif item.type() == Node.Type:
-                        item.delete()
+
                 return True
 
         elif event.type() == QtCore.QEvent.GraphicsSceneMouseMove:
