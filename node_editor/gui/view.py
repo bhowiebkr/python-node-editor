@@ -41,6 +41,11 @@ class View(QtWidgets.QGraphicsView):
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
 
     def wheelEvent(self, event):
+
+        # sometimes you can triger the wheen when panning so we disable when panning
+        if self._pan:
+            return
+
         num_degrees = event.delta() / 8.0
         num_steps = num_degrees / 5.0
         self._numScheduledScalings += num_steps
