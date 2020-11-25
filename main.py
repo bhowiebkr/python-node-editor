@@ -2,7 +2,6 @@ import sys
 
 from PySide2 import QtWidgets, QtCore, QtGui
 
-import qdarkstyle
 import logging
 import os
 
