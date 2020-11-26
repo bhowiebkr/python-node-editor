@@ -9,6 +9,7 @@ class NodeEditor(QtCore.QObject):
     def __init__(self, parent):
         super(NodeEditor, self).__init__(parent)
         self.connection = None
+        self.port = None
         self.scene = None
         self._last_selected = None
 
@@ -37,7 +38,8 @@ class NodeEditor(QtCore.QObject):
                 if isinstance(item, Port):
                     self.connection = Connection(None)
                     self.scene.addItem(self.connection)
-                    self.connection.start_port = item
+                    # self.connection.start_port = item
+                    self.port = item
                     self.connection.start_pos = item.scenePos()
                     self.connection.end_pos = event.scenePos()
                     self.connection.update_path()
@@ -45,8 +47,10 @@ class NodeEditor(QtCore.QObject):
 
                 elif isinstance(item, Connection):
                     self.connection = Connection(None)
+                    self.connection.start_pos = item.start_pos
                     self.scene.addItem(self.connection)
-                    self.connection.start_port = item.start_port
+                    # self.connection.start_port = item.start_port
+                    self.port = item.start_port
                     self.connection.end_pos = event.scenePos()
                     self.connection.update_start_and_end_pos()  # to fix the offset
                     return True
@@ -94,28 +98,35 @@ class NodeEditor(QtCore.QObject):
         elif event.type() == QtCore.QEvent.GraphicsSceneMouseRelease:
             if self.connection and event.button() == QtCore.Qt.LeftButton:
                 item = self.item_at(event.scenePos())
-                if isinstance(item, Port):
-                    start_port = self.connection.start_port
-                    end_port = item
 
-                    if (
-                        start_port.node() != end_port.node()
-                        and start_port.is_output() != end_port.is_output()
-                        and not start_port.is_connected(end_port)
-                    ):
-                        self.connection.end_port = end_port
+                # connecting a port
+                if isinstance(item, Port):
+                    if self.port.can_connect_to(item):
+                        print("Making connection")
+
+                        # delete existing connection on the new port
+                        if item.connection:
+                            item.connection.delete()
+
+                        # delete existing connection to the original port
+                        self.port.clear_connection()
+                        item.clear_connection()
+
+                        self.connection.start_port = self.port
+
+                        self.connection.end_port = item
 
                         self.connection.update_start_and_end_pos()
                         self.connection = None
+                    else:
+                        print("Deleting connection")
+                        self.connection.delete()
+                        self.connection = None
 
-                        # # Flip them aroud if wired the wrong way
-                        # if not self.connection.start_port.is_output():
-                        #     self.connection.flip_connections()
-
-                        return True
-
-                self.connection.delete()
+                if self.connection:
+                    self.connection.delete()
                 self.connection = None
+                self.port = None
                 return True
 
         return super(NodeEditor, self).eventFilter(watched, event)

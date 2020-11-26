@@ -158,9 +158,12 @@ class Node(QtWidgets.QGraphicsPathItem):
 
     def select_connections(self, value):
         for port in self._ports:
-            for connection in port.connections():
-                connection._do_highlight = value
-                connection.update_path()
+            if port.connection:
+                port.connection._do_highlight = value
+                port.connection.update_path()
+            # for connection in port.connections():
+            #     connection._do_highlight = value
+            #     connection.update_path()
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu(self)
@@ -196,8 +199,8 @@ class Node(QtWidgets.QGraphicsPathItem):
         to_delete = []
 
         for port in self._ports:
-            for connection in port.connections():
-                to_delete.append(connection)
+            if port.connection:
+                to_delete.append(port.connection)
 
         for connection in to_delete:
             connection.delete()

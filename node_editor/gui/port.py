@@ -20,24 +20,24 @@ class Port(QtWidgets.QGraphicsPathItem):
 
         self.port_text_height = self.font_metrics.height()
 
-        self.is_output_ = False
+        self._is_output = False
         self._name = None
         self.margin = 2
 
         self.m_node = None
-        self.m_connections = []
+        self.connection = None
 
         self.text_path = QtGui.QPainterPath()
 
     def set_is_output(self, is_output):
-        self.is_output_ = is_output
+        self._is_output = is_output
 
     def set_name(self, name):
         self._name = name
         nice_name = self._name.replace("_", " ").title()
         self.port_text_width = self.font_metrics.width(nice_name)
 
-        if self.is_output_:
+        if self._is_output:
             x = -self.radius_ - self.margin - self.port_text_width
             y = self.port_text_height / 4
 
@@ -62,7 +62,7 @@ class Port(QtWidgets.QGraphicsPathItem):
         return self._name
 
     def is_output(self):
-        return self.is_output_
+        return self._is_output
 
     def node(self):
         return self.m_node
@@ -76,27 +76,30 @@ class Port(QtWidgets.QGraphicsPathItem):
         painter.setBrush(QtCore.Qt.white)
         painter.drawPath(self.text_path)
 
-    def add_connection(self, connection):
-        self.m_connections.append(connection)
+    def clear_connection(self):
+        if self.connection:
+            self.connection.delete()
 
-    def remove_connection(self, connection):
-        try:
-            self.m_connections.remove(connection)
-        except:
-            pass
+    def can_connect_to(self, port):
+        print(port.node(), self.node())
+        if not port:
+            return False
+        if port.node() == self.node():
+            return False
 
-    def connections(self):
-        return self.m_connections
+        if self._is_output == port._is_output:
+            return False
 
-    def is_connected(self, other):
-        for connection in self.m_connections:
-            if connection.start_port == other or connection.end_port == other:
-                return True
+        return True
+
+    def is_connected(self):
+        if self.connection:
+            return True
         return False
 
     def itemChange(self, change, value):
         if change == QtWidgets.QGraphicsItem.ItemScenePositionHasChanged:
-            for connection in self.m_connections:
-                connection.update_start_and_end_pos()
+            if self.connection:
+                self.connection.update_start_and_end_pos()
 
         return value

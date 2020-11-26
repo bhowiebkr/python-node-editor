@@ -22,7 +22,8 @@ class Connection(QtWidgets.QGraphicsPathItem):
     def delete(self):
         for port in (self._start_port, self._end_port):
             if port:
-                port.remove_connection(self)
+                # port.remove_connection(self)
+                port.connection = None
             port = None
 
         self.scene().removeItem(self)
@@ -38,12 +39,12 @@ class Connection(QtWidgets.QGraphicsPathItem):
     @start_port.setter
     def start_port(self, port):
         self._start_port = port
-        self._start_port.add_connection(self)
+        self._start_port.connection = self
 
     @end_port.setter
     def end_port(self, port):
         self._end_port = port
-        self._end_port.add_connection(self)
+        self._end_port.connection = self
 
     def nodes(self):
         return (self._start_port().node(), self._end_port().node())
@@ -54,7 +55,7 @@ class Connection(QtWidgets.QGraphicsPathItem):
         Get the start and end ports and use them to set the start and end positions.
         """
 
-        if not self.start_port.is_output():
+        if self.start_port and not self.start_port.is_output():
             print("flipping connection")
             temp = self.end_port
             self._end_port = self.start_port
