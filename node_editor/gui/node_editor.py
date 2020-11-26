@@ -25,14 +25,6 @@ class NodeEditor(QtCore.QObject):
             return items[0]
         return None
 
-        # for item in items:
-        #     return item
-
-        #     # if item.type() > QtWidgets.QGraphicsItem.UserType:
-        #     #     return item
-
-        # return None
-
     def eventFilter(self, watched, event):
         if type(event) == QtWidgets.QWidgetItem:
             return False
@@ -45,19 +37,18 @@ class NodeEditor(QtCore.QObject):
                 if isinstance(item, Port):
                     self.connection = Connection(None)
                     self.scene.addItem(self.connection)
-                    self.connection.set_port_1(item)
-                    self.connection.set_pos_1(item.scenePos())
-                    self.connection.set_pos_2(event.scenePos())
+                    self.connection.start_port = item
+                    self.connection.start_pos = item.scenePos()
+                    self.connection.end_pos = event.scenePos()
                     self.connection.update_path()
                     return True
 
                 elif isinstance(item, Connection):
                     self.connection = Connection(None)
                     self.scene.addItem(self.connection)
-                    self.connection.set_port_1(item.port1())
-                    self.connection.set_pos_2(event.scenePos())
-                    self.connection.update_pos_from_ports()  # to fix the offset
-                    self.connection.update_path()
+                    self.connection.start_port = item.start_port
+                    self.connection.end_pos = event.scenePos()
+                    self.connection.update_start_and_end_pos()  # to fix the offset
                     return True
 
                 elif isinstance(item, Node):
@@ -96,7 +87,7 @@ class NodeEditor(QtCore.QObject):
 
         elif event.type() == QtCore.QEvent.GraphicsSceneMouseMove:
             if self.connection:
-                self.connection.set_pos_2(event.scenePos())
+                self.connection.end_pos = event.scenePos()
                 self.connection.update_path()
                 return True
 
@@ -104,19 +95,23 @@ class NodeEditor(QtCore.QObject):
             if self.connection and event.button() == QtCore.Qt.LeftButton:
                 item = self.item_at(event.scenePos())
                 if isinstance(item, Port):
-                    # if item and item.type() == Port.Type:
-                    port1 = self.connection.port1()
-                    port2 = item
+                    start_port = self.connection.start_port
+                    end_port = item
 
                     if (
-                        port1.node() != port2.node()
-                        and port1.is_output() != port2.is_output()
-                        and not port1.is_connected(port2)
+                        start_port.node() != end_port.node()
+                        and start_port.is_output() != end_port.is_output()
+                        and not start_port.is_connected(end_port)
                     ):
-                        self.connection.set_pos_2(port2.scenePos())
-                        self.connection.set_port_2(port2)
-                        self.connection.update_path()
+                        self.connection.end_port = end_port
+
+                        self.connection.update_start_and_end_pos()
                         self.connection = None
+
+                        # # Flip them aroud if wired the wrong way
+                        # if not self.connection.start_port.is_output():
+                        #     self.connection.flip_connections()
+
                         return True
 
                 self.connection.delete()

@@ -90,14 +90,13 @@ class Port(QtWidgets.QGraphicsPathItem):
 
     def is_connected(self, other):
         for connection in self.m_connections:
-            if connection.port1() == other or connection.port2() == other:
+            if connection.start_port == other or connection.end_port == other:
                 return True
         return False
 
     def itemChange(self, change, value):
         if change == QtWidgets.QGraphicsItem.ItemScenePositionHasChanged:
             for connection in self.m_connections:
-                connection.update_pos_from_ports()
-                connection.update_path()
+                connection.update_start_and_end_pos()
 
         return value
