@@ -139,7 +139,6 @@ class View(QtWidgets.QGraphicsView):
 
                 hello_action = QtWidgets.QAction("Hello", self)
 
-                # elbow_action.triggered.connect(self.add_elbow)
                 menu.addAction(hello_action)
                 action = menu.exec_(self.mapToGlobal(pos))
 
