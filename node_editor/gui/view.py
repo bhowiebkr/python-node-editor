@@ -1,6 +1,7 @@
 from PySide2 import QtCore, QtGui, QtWidgets, QtOpenGL
 
 from node_editor.gui.connection import Connection
+from node_editor.gui.node import Node
 
 
 class View(QtWidgets.QGraphicsView):
@@ -125,17 +126,25 @@ class View(QtWidgets.QGraphicsView):
 
     def contextMenuEvent(self, event):
         cursor = QtGui.QCursor()
-        origin = self.mapFromGlobal(cursor.pos())
-        pos = self.mapToScene(origin)
+        # origin = self.mapFromGlobal(cursor.pos())
+        pos = self.mapFromGlobal(cursor.pos())
         item = self.itemAt(event.pos())
 
         if item:
-            if isinstance(item, Connection):
+            if isinstance(item, Node):
 
-                print("Found Connection", item)
-                elbow_action = QtWidgets.QAction("Add Elbow", self)
-                elbow_action.triggered.connect(self.add_elbow)
-                self.menu.addAction(elbow_action)
+                print("Found Node", item)
+
+                menu = QtWidgets.QMenu(self)
+
+                hello_action = QtWidgets.QAction("Hello", self)
+
+                # elbow_action.triggered.connect(self.add_elbow)
+                menu.addAction(hello_action)
+                action = menu.exec_(self.mapToGlobal(pos))
+
+                if action == hello_action:
+                    print("Hello")
 
     def dragEnterEvent(self, e):
 
