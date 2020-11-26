@@ -49,6 +49,16 @@ def create_not():
     return node
 
 
+def create_nor():
+    node = Node()
+    node.title = "NOR"
+    node.type_text = "built-in"
+    node.add_port(name="input", is_output=False)
+    node.add_port(name="output", is_output=True)
+    node.build()
+    return node
+
+
 class NodeScene(QtWidgets.QGraphicsScene):
     def dragEnterEvent(self, e):
         e.acceptProposedAction()
@@ -97,6 +107,8 @@ class NodeWidget(QtWidgets.QWidget):
             node = create_and()
         elif name == "Not":
             node = create_not()
+        elif name == "Nor":
+            node = create_nor()
 
         self.scene.addItem(node)
 

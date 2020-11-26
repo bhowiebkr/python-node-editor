@@ -9,6 +9,7 @@ class NodeList(QtWidgets.QListWidget):
         self.addItem("Output")
         self.addItem("And")
         self.addItem("Not")
+        self.addItem("Nor")
 
         self.setDragEnabled(True)  # enable dragging
 
