@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore
 
 from node_editor.gui.connection import Connection
 from node_editor.gui.node import Node

@@ -1,6 +1,6 @@
 # from PySide2.QtWidgets import QWidget, QVBoxLayout, QGraphicsScene
 
-from PySide2 import QtWidgets, QtGui
+from PySide6 import QtWidgets, QtGui
 
 from node_editor.gui.view import View
 from node_editor.gui.node import Node

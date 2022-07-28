@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui, QtCore
 
 from node_editor.gui.port import Port
 
@@ -87,12 +87,12 @@ class Node(QtWidgets.QGraphicsPathItem):
 
         # Get the dimentions of the title and type
         title_dim = {
-            "w": QtGui.QFontMetrics(title_font).width(self._title_text),
+            "w": QtGui.QFontMetrics(title_font).horizontalAdvance(self._title_text),
             "h": QtGui.QFontMetrics(title_font).height(),
         }
 
         title_type_dim = {
-            "w": QtGui.QFontMetrics(title_type_font).width("(" + self._type_text + ")"),
+            "w": QtGui.QFontMetrics(title_type_font).horizontalAdvance("(" + self._type_text + ")"),
             "h": QtGui.QFontMetrics(title_type_font).height(),
         }
 
@@ -108,7 +108,7 @@ class Node(QtWidgets.QGraphicsPathItem):
         # Add the heigth for each of the ports
         for port in self._ports:
             port_dim = {
-                "w": QtGui.QFontMetrics(port_font).width(port.name()),
+                "w": QtGui.QFontMetrics(port_font).horizontalAdvance(port.name()),
                 "h": QtGui.QFontMetrics(port_font).height(),
             }
 
