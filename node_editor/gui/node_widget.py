@@ -1,4 +1,4 @@
-# from PySide2.QtWidgets import QWidget, QVBoxLayout, QGraphicsScene
+# from PySide6.QtWidgets import QWidget, QVBoxLayout, QGraphicsScene
 
 from PySide6 import QtWidgets, QtGui
 
