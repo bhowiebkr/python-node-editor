@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui, QtCore
 
 
 class Port(QtWidgets.QGraphicsPathItem):
@@ -35,7 +35,7 @@ class Port(QtWidgets.QGraphicsPathItem):
     def set_name(self, name):
         self._name = name
         nice_name = self._name.replace("_", " ").title()
-        self.port_text_width = self.font_metrics.width(nice_name)
+        self.port_text_width = self.font_metrics.horizontalAdvance(nice_name)
 
         if self._is_output:
             x = -self.radius_ - self.margin - self.port_text_width

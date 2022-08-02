@@ -1,4 +1,4 @@
-from PySide2 import QtCore, QtGui, QtWidgets, QtOpenGL
+from PySide6 import QtCore, QtGui, QtWidgets, QtOpenGLWidgets
 
 from node_editor.gui.connection import Connection
 from node_editor.gui.node import Node
@@ -22,9 +22,10 @@ class View(QtWidgets.QGraphicsView):
         self.setRenderHint(QtGui.QPainter.Antialiasing)
         self._manipulationMode = 0
 
-        gl_format = QtOpenGL.QGLFormat(QtOpenGL.QGL.SampleBuffers)
+        gl_format = QtGui.QSurfaceFormat()
         gl_format.setSamples(10)
-        gl_widget = QtOpenGL.QGLWidget(gl_format)
+        QtGui.QSurfaceFormat.setDefaultFormat(gl_format)
+        gl_widget = QtOpenGLWidgets.QOpenGLWidget()
 
         self.currentScale = 1
         self._pan = False

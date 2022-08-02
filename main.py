@@ -1,6 +1,6 @@
 import sys
 
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui
 
 import logging
 import os
@@ -61,5 +61,5 @@ if __name__ == "__main__":
     app.setPalette(palette)
     launcher = NodeEditor()
     launcher.show()
-    app.exec_()
+    app.exec()
     sys.exit()
