@@ -160,9 +160,6 @@ class Node(QtWidgets.QGraphicsPathItem):
             if port.connection:
                 port.connection._do_highlight = value
                 port.connection.update_path()
-            # for connection in port.connections():
-            #     connection._do_highlight = value
-            #     connection.update_path()
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu(self)
