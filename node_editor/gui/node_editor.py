@@ -35,7 +35,6 @@ class NodeEditor(QtCore.QObject):
                 if isinstance(item, Port):
                     self.connection = Connection(None)
                     self.scene.addItem(self.connection)
-                    # self.connection.start_port = item
                     self.port = item
                     self.connection.start_pos = item.scenePos()
                     self.connection.end_pos = event.scenePos()
@@ -46,7 +45,6 @@ class NodeEditor(QtCore.QObject):
                     self.connection = Connection(None)
                     self.connection.start_pos = item.start_pos
                     self.scene.addItem(self.connection)
-                    # self.connection.start_port = item.start_port
                     self.port = item.start_port
                     self.connection.end_pos = event.scenePos()
                     self.connection.update_start_and_end_pos()  # to fix the offset
