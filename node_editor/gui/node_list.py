@@ -11,30 +11,6 @@ class NodeList(QtWidgets.QListWidget):
 
         self.setDragEnabled(True)  # enable dragging
 
-    def contextMenuEvent(self, event):
-        menu = QtWidgets.QMenu(self)
-        pos = event.pos()
-
-        # actions
-        delete_node = QtGui.QAction("Delete Node")
-        edit_node = QtGui.QAction("Edit Node")
-        menu.addAction(delete_node)
-
-        action = menu.exec_(self.mapToGlobal(pos))
-
-        if action == delete_node:
-            item_name = self.selectedItems()[0].text()
-
-            if item_name not in ["And", "Not", "Input", "Output Signal/Slot"]:
-                print(f"delete node: {item_name}")
-            else:
-                print("Cannot delete default nodes")
-
-        elif action == edit_node:
-            print("editing node")
-
-            # confirm to open in the editor replacing what is existing
-
     def mousePressEvent(self, event):
         item = self.itemAt(event.pos())
         if item and item.text():
