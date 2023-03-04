@@ -68,10 +68,7 @@ class NodeScene(QtWidgets.QGraphicsScene):
         item = self.itemAt(e.scenePos())
         if item.setAcceptDrops == True:
             # pass on event to item at the coordinates
-            try:
-                item.dropEvent(e)
-            except RuntimeError:
-                pass  # This will supress a Runtime Error generated when dropping into a widget with no ProxyWidget
+            item.dropEvent(e)
 
     def dragMoveEvent(self, e):
         e.acceptProposedAction()

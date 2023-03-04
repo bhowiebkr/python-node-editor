@@ -43,7 +43,6 @@ class View(QtWidgets.QGraphicsView):
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
 
     def wheelEvent(self, event):
-
         # sometimes you can triger the wheen when panning so we disable when panning
         if self._pan:
             return
@@ -77,7 +76,6 @@ class View(QtWidgets.QGraphicsView):
             self._numScheduledScalings += 1
 
     def drawBackground(self, painter, rect):
-
         painter.fillRect(rect, self._background_color)
 
         left = int(rect.left()) - (int(rect.left()) % self._grid_size_fine)
@@ -133,21 +131,19 @@ class View(QtWidgets.QGraphicsView):
 
         if item:
             if isinstance(item, Node):
-
                 print("Found Node", item)
 
                 menu = QtWidgets.QMenu(self)
 
-                hello_action = QtWidgets.QAction("Hello", self)
+                # hello_action = QtWidgets.QAction("Hello", self)
 
-                menu.addAction(hello_action)
-                action = menu.exec_(self.mapToGlobal(pos))
+                # menu.addAction(hello_action)
+                # action = menu.exec_(self.mapToGlobal(pos))
 
-                if action == hello_action:
-                    print("Hello")
+                # if action == hello_action:
+                #    print("Hello")
 
     def dragEnterEvent(self, e):
-
         if e.mimeData().hasFormat("text/plain"):
             e.accept()
         else:
@@ -175,17 +171,11 @@ class View(QtWidgets.QGraphicsView):
 
     def mouseMoveEvent(self, event):
         if self._pan:
+            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - (event.x() - self._pan_start_x))
 
-            self.horizontalScrollBar().setValue(
-                self.horizontalScrollBar().value() - (event.x() - self._pan_start_x)
-            )
-
-            self.verticalScrollBar().setValue(
-                self.verticalScrollBar().value() - (event.y() - self._pan_start_y)
-            )
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - (event.y() - self._pan_start_y))
 
             self._pan_start_x = event.x()
             self._pan_start_y = event.y()
 
         return super(View, self).mouseMoveEvent(event)
-

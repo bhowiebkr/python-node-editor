@@ -9,9 +9,7 @@ class Port(QtWidgets.QGraphicsPathItem):
         self.margin = 2
 
         path = QtGui.QPainterPath()
-        path.addEllipse(
-            -self.radius_, -self.radius_, 2 * self.radius_, 2 * self.radius_
-        )
+        path.addEllipse(-self.radius_, -self.radius_, 2 * self.radius_, 2 * self.radius_)
         self.setPath(path)
 
         self.setFlag(QtWidgets.QGraphicsPathItem.ItemSendsScenePositionChanges)

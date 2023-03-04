@@ -44,9 +44,7 @@ class NodeEditor(QtWidgets.QMainWindow):
             self.splitter.restoreState(s)
 
         except AttributeError as e:
-            logging.warning(
-                "Unable to load settings. First time opening the tool?\n" + str(e)
-            )
+            logging.warning("Unable to load settings. First time opening the tool?\n" + str(e))
 
     def closeEvent(self, event):
         self.settings = QtCore.QSettings("node-editor", "NodeEditor")

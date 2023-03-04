@@ -71,8 +71,7 @@ class Connection(QtWidgets.QGraphicsPathItem):
         self.update_path()
 
     def update_path(self):
-        """Draw a smooth cubic curve from the start to end ports
-        """
+        """Draw a smooth cubic curve from the start to end ports"""
         path = QtGui.QPainterPath()
         path.moveTo(self.start_pos)
 
@@ -95,4 +94,3 @@ class Connection(QtWidgets.QGraphicsPathItem):
             painter.setPen(QtGui.QPen(QtGui.QColor(0, 128, 255), 2))
 
         painter.drawPath(self.path())
-

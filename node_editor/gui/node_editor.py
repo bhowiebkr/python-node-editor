@@ -18,9 +18,7 @@ class NodeEditor(QtCore.QObject):
         self.scene.installEventFilter(self)
 
     def item_at(self, position):
-        items = self.scene.items(
-            QtCore.QRectF(position - QtCore.QPointF(1, 1), QtCore.QSizeF(3, 3))
-        )
+        items = self.scene.items(QtCore.QRectF(position - QtCore.QPointF(1, 1), QtCore.QSizeF(3, 3)))
 
         if items:
             return items[0]
@@ -31,7 +29,6 @@ class NodeEditor(QtCore.QObject):
             return False
 
         if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
-
             if event.button() == QtCore.Qt.LeftButton:
                 item = self.item_at(event.scenePos())
 
@@ -81,9 +78,7 @@ class NodeEditor(QtCore.QObject):
 
         elif event.type() == QtCore.QEvent.KeyPress:
             if event.key() == QtCore.Qt.Key_Delete:
-
                 for item in self.scene.selectedItems():
-
                     if isinstance(item, (Connection, Node)):
                         item.delete()
 

@@ -69,8 +69,7 @@ class Node(QtWidgets.QGraphicsPathItem):
         self._ports.append(port)
 
     def build(self):
-        """ Build the node
-        """
+        """Build the node"""
 
         self.title_path = QtGui.QPainterPath()  # reset
         self.type_path = QtGui.QPainterPath()  # The path for the type
@@ -122,9 +121,7 @@ class Node(QtWidgets.QGraphicsPathItem):
         total_height += self.vertical_margin
 
         # Draw the background rectangle
-        path.addRoundedRect(
-            -total_width / 2, -total_height / 2, total_width, total_height, 5, 5
-        )
+        path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, total_height, 5, 5)
 
         # Draw the title
         self.title_path.addText(
