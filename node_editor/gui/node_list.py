@@ -5,11 +5,9 @@ class NodeList(QtWidgets.QListWidget):
     def __init__(self, parent=None):
         super(NodeList, self).__init__(parent)
 
-        self.addItem("Input")
-        self.addItem("Output")
-        self.addItem("And")
-        self.addItem("Not")
-        self.addItem("Nor")
+        for node in ["Input", "Output", "And", "Not", "Nor", "Empty"]:
+            item = QtWidgets.QListWidgetItem(node)
+            self.addItem(item)
 
         self.setDragEnabled(True)  # enable dragging
 
@@ -18,8 +16,8 @@ class NodeList(QtWidgets.QListWidget):
         pos = event.pos()
 
         # actions
-        delete_node = QtWidgets.QAction("Delete Node")
-        edit_node = QtWidgets.QAction("Edit Node")
+        delete_node = QtGui.QAction("Delete Node")
+        edit_node = QtGui.QAction("Edit Node")
         menu.addAction(delete_node)
 
         action = menu.exec_(self.mapToGlobal(pos))
@@ -27,7 +25,7 @@ class NodeList(QtWidgets.QListWidget):
         if action == delete_node:
             item_name = self.selectedItems()[0].text()
 
-            if item_name not in ["And", "Not", "Input", "Output"]:
+            if item_name not in ["And", "Not", "Input", "Output Signal/Slot"]:
                 print(f"delete node: {item_name}")
             else:
                 print("Cannot delete default nodes")
@@ -39,13 +37,18 @@ class NodeList(QtWidgets.QListWidget):
 
     def mousePressEvent(self, event):
         item = self.itemAt(event.pos())
-        name = item.text()
+        if item and item.text():
+            name = item.text()
 
-        drag = QtGui.QDrag(self)
-        mime_data = QtCore.QMimeData()
+            drag = QtGui.QDrag(self)
+            mime_data = QtCore.QMimeData()
+            mime_data.setText(name)
+            drag.setMimeData(mime_data)
 
-        mime_data.setText(name)
-        drag.setMimeData(mime_data)
-        drag.exec_()
+            # Drag needs a pixmap or else it'll error due to a null pixmap
+            pixmap = QtGui.QPixmap(16, 16)
+            pixmap.fill(QtGui.QColor("darkgray"))
+            drag.setPixmap(pixmap)
+            drag.exec_()
 
-        super(NodeList, self).mousePressEvent(event)
+            super(NodeList, self).mousePressEvent(event)

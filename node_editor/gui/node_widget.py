@@ -59,6 +59,14 @@ def create_nor():
     return node
 
 
+def create_empty():
+    node = Node()
+    node.title = "NOR"
+    node.type_text = "empty node"
+    node.build()
+    return node
+
+
 class NodeScene(QtWidgets.QGraphicsScene):
     def dragEnterEvent(self, e):
         e.acceptProposedAction()
@@ -97,7 +105,6 @@ class NodeWidget(QtWidgets.QWidget):
 
         if name == "Input":
             node = create_input()
-
         elif name == "Output":
             node = create_output()
         elif name == "And":
@@ -106,6 +113,11 @@ class NodeWidget(QtWidgets.QWidget):
             node = create_not()
         elif name == "Nor":
             node = create_nor()
+        elif name == "Empty":
+            node = create_empty()
+        else:
+            print(f"Can't find a premade node for {name}")
+            return
 
         self.scene.addItem(node)
 

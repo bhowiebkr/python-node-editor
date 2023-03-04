@@ -38,13 +38,11 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.splitter.addWidget(self.node_list)
         self.splitter.addWidget(self.node_widget)
 
-        try:
+        if settings.contains("geometry"):
             self.restoreGeometry(settings.value("geometry"))
+
             s = settings.value("splitterSize")
             self.splitter.restoreState(s)
-
-        except AttributeError as e:
-            logging.warning("Unable to load settings. First time opening the tool?\n" + str(e))
 
     def closeEvent(self, event):
         self.settings = QtCore.QSettings("node-editor", "NodeEditor")

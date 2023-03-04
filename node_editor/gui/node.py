@@ -104,6 +104,7 @@ class Node(QtWidgets.QGraphicsPathItem):
         for dim in [title_dim["h"], title_type_dim["h"]]:
             total_height += dim
 
+        port_dim = None
         # Add the heigth for each of the ports
         for port in self._ports:
             port_dim = {
@@ -139,14 +140,15 @@ class Node(QtWidgets.QGraphicsPathItem):
             "(" + self._type_text + ")",
         )
 
-        y = (-total_height / 2) + title_dim["h"] + title_type_dim["h"] + port_dim["h"]
+        if port_dim:
+            y = (-total_height / 2) + title_dim["h"] + title_type_dim["h"] + port_dim["h"]
 
-        for port in self._ports:
-            if port.is_output():
-                port.setPos(total_width / 2 - 10, y)
-            else:
-                port.setPos(-total_width / 2 + 10, y)
-            y += port_dim["h"]
+            for port in self._ports:
+                if port.is_output():
+                    port.setPos(total_width / 2 - 10, y)
+                else:
+                    port.setPos(-total_width / 2 + 10, y)
+                y += port_dim["h"]
 
         self.setPath(path)
 
