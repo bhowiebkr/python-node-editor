@@ -1,3 +1,15 @@
+"""
+A simple Node Editor application that allows the user to create, modify and connect nodes of various types.
+
+The application consists of a main window that contains a splitter with a Node List and a Node Widget. The Node List
+shows a list of available node types, while the Node Widget is where the user can create, edit and connect nodes.
+
+This application uses PySide6 as a GUI toolkit.
+
+Author: Bryan Howard
+Repo: https://github.com/bhowiebkr/simple-node-editor
+"""
+
 import sys
 
 from PySide6 import QtWidgets, QtCore, QtGui
@@ -64,6 +76,12 @@ class NodeEditor(QtWidgets.QMainWindow):
             self.splitter.restoreState(s)
 
     def new_node_cmd(self):
+        """
+        Handles the New Node Type button click event by showing the NodeTypeEditor dialog.
+
+        Returns:
+            None.
+        """
         node_editor = NodeTypeEditor()
 
         if node_editor.exec() == QtWidgets.QDialog.Accepted:
@@ -72,6 +90,15 @@ class NodeEditor(QtWidgets.QMainWindow):
             print("Dialog canceled")
 
     def closeEvent(self, event):
+        """
+        Handles the close event by saving the GUI state and closing the application.
+
+        Args:
+            event: Close event.
+
+        Returns:
+            None.
+        """
         self.settings = QtCore.QSettings("node-editor", "NodeEditor")
         self.settings.setValue("geometry", self.saveGeometry())
         self.settings.setValue("splitterSize", self.splitter.saveState())

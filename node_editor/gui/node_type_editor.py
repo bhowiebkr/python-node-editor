@@ -2,7 +2,20 @@ from PySide6 import QtWidgets, QtGui
 
 
 class NodeTypeEditor(QtWidgets.QDialog):
+    """
+    A dialog window for editing node types.
+
+    Attributes:
+        edit (QtWidgets.QLineEdit): A line edit widget for editing the node type.
+    """
+
     def __init__(self, parent=None):
+        """
+        Constructs a NodeTypeEditor object.
+
+        Args:
+            parent (QWidget): The parent widget of this dialog.
+        """
         super().__init__(parent)
 
         self.setWindowTitle("Node Type Editor")

@@ -2,6 +2,30 @@ from PySide6 import QtWidgets, QtGui, QtCore
 
 
 class Connection(QtWidgets.QGraphicsPathItem):
+    """
+    A Connection represents a graphical connection between two NodePorts in a PySide6 application.
+
+    Attributes:
+    start_port (NodePort): The NodePort where the connection starts.
+    end_port (NodePort): The NodePort where the connection ends.
+    start_pos (QPointF): The starting position of the connection.
+    end_pos (QPointF): The ending position of the connection.
+
+    Methods:
+    delete(): Deletes the connection.
+    nodes(): Returns a tuple of the two connected nodes.
+    update_start_and_end_pos(): Updates the starting and ending positions of the connection.
+    update_path(): Draws a smooth cubic curve from the starting to ending position of the connection.
+    paint(painter, option=None, widget=None): Override the default paint method depending on if the object is selected.
+
+    Example:
+    conn = Connection(parent)
+    conn.start_port = start_port
+    conn.end_port = end_port
+    conn.update_start_and_end_pos()
+    conn.update_path()
+    """
+
     def __init__(self, parent):
         super(Connection, self).__init__(parent)
 
@@ -20,6 +44,9 @@ class Connection(QtWidgets.QGraphicsPathItem):
         self._do_highlight = False
 
     def delete(self):
+        """
+        Deletes the connection and removes it from the scene and any connected ports.
+        """
         for port in (self._start_port, self._end_port):
             if port:
                 # port.remove_connection(self)
@@ -47,10 +74,17 @@ class Connection(QtWidgets.QGraphicsPathItem):
         self._end_port.connection = self
 
     def nodes(self):
+        """
+        Returns a tuple of the two connected nodes.
+
+        Returns:
+        tuple: A tuple of the two Node objects connected by this Connection.
+        """
         return (self._start_port().node(), self._end_port().node())
 
     def update_start_and_end_pos(self):
-        """Update the ends of the connection
+        """
+        Update the start and end positions of the Connection.
 
         Get the start and end ports and use them to set the start and end positions.
         """
@@ -71,7 +105,9 @@ class Connection(QtWidgets.QGraphicsPathItem):
         self.update_path()
 
     def update_path(self):
-        """Draw a smooth cubic curve from the start to end ports"""
+        """
+        Draws a smooth cubic curve from the start to end ports.
+        """
         path = QtGui.QPainterPath()
         path.moveTo(self.start_pos)
 
@@ -86,7 +122,12 @@ class Connection(QtWidgets.QGraphicsPathItem):
 
     def paint(self, painter, option=None, widget=None):
         """
-        Override the default paint method depending on if the object is selected
+        Override the default paint method depending on if the object is selected.
+
+        Args:
+        painter (QPainter): The QPainter object used to paint the Connection.
+        option (QStyleOptionGraphicsItem): The style options for the Connection.
+        widget (QWidget): The widget used to paint the Connection.
         """
         if self.isSelected() or self._do_highlight:
             painter.setPen(QtGui.QPen(QtGui.QColor(255, 102, 0), 3))

@@ -4,6 +4,36 @@ from node_editor.gui.port import Port
 
 
 class Node(QtWidgets.QGraphicsPathItem):
+    """
+    A QGraphicsPathItem representing a node in the node editor.
+
+    Attributes
+    ----------
+    node_color : QtGui.QColor
+        The color of the node.
+    _title_text : str
+        The text of the node's title.
+    _type_text : str
+        The text of the node's type.
+    _width : int
+        The width of the node.
+    _height : int
+        The height of the node.
+    _ports : list
+        A list of ports connected to this node.
+    title_path : QtGui.QPainterPath
+        The path for the title of the node.
+    type_path : QtGui.QPainterPath
+        The path for the type of the node.
+    misc_path : QtGui.QPainterPath
+        The path for miscellaneous items.
+    horizontal_margin : int
+        The horizontal margin of the node.
+    vertical_margin : int
+        The vertical margin of the node.
+
+    """
+
     def __init__(self):
         super(Node, self).__init__()
 
@@ -43,6 +73,15 @@ class Node(QtWidgets.QGraphicsPathItem):
         self._type_text = type_text
 
     def paint(self, painter, option=None, widget=None):
+        """
+        Paints the node on the given painter.
+
+        Args:
+            painter (QtGui.QPainter): The painter to use for drawing the node.
+            option (QStyleOptionGraphicsItem): The style options to use for drawing the node (optional).
+            widget (QWidget): The widget to use for drawing the node (optional).
+        """
+
         if self.isSelected():
             painter.setPen(QtGui.QPen(QtGui.QColor(241, 175, 0), 2))
             painter.setBrush(self.node_color)
@@ -59,6 +98,19 @@ class Node(QtWidgets.QGraphicsPathItem):
         painter.drawPath(self.misc_path)
 
     def add_port(self, name, is_output=False, flags=0, ptr=None):
+        """
+        Adds a new port to the node.
+
+        Args:
+            name (str): The name of the new port.
+            is_output (bool, optional): True if the new port is an output port, False if it's an input port. Default is False.
+            flags (int, optional): A set of flags to apply to the new port. Default is 0.
+            ptr (Any, optional): A pointer to associate with the new port. Default is None.
+
+        Returns:
+            None: This method doesn't return anything.
+
+        """
         port = Port(self, self.scene())
         port.set_is_output(is_output)
         port.set_name(name)
@@ -69,7 +121,16 @@ class Node(QtWidgets.QGraphicsPathItem):
         self._ports.append(port)
 
     def build(self):
-        """Build the node"""
+        """
+        Builds the node by constructing its graphical representation.
+
+        This method calculates the dimensions of the node, sets the fonts for various elements, and adds the necessary
+        graphical components to the node, such as the title, type, and ports. Once the graphical representation of the node
+        is constructed, the `setPath` method is called to set the path for the node.
+
+        Returns:
+            None.
+        """
 
         self.title_path = QtGui.QPainterPath()  # reset
         self.type_path = QtGui.QPainterPath()  # The path for the type
@@ -156,12 +217,34 @@ class Node(QtWidgets.QGraphicsPathItem):
         self._height = total_height
 
     def select_connections(self, value):
+        """
+        Sets the highlighting of all connected ports to the specified value.
+
+        This method takes a boolean value `value` as input and sets the `_do_highlight` attribute of all connected ports to
+        this value. If a port is not connected, this method does nothing for that port. After setting the `_do_highlight`
+        attribute for all connected ports, the `update_path` method is called for each connection.
+
+        Args:
+            value: A boolean value indicating whether to highlight the connected ports or not.
+
+        Returns:
+            None.
+        """
+
         for port in self._ports:
             if port.connection:
                 port.connection._do_highlight = value
                 port.connection.update_path()
 
     def contextMenuEvent(self, event):
+        """Open a context menu when the node is right-clicked.
+
+        Args:
+            event (QtGui.QContextMenuEvent): The context menu event.
+
+        Returns:
+            None
+        """
         menu = QtWidgets.QMenu(self)
         pos = event.pos()
 
@@ -186,10 +269,15 @@ class Node(QtWidgets.QGraphicsPathItem):
             # confirm to open in the editor replacing what is existing
 
     def delete(self):
-        """Delete the connection.
-        Remove any found connections ports by calling :any:`Port.remove_connection`.  After connections
-        have been removed set the stored :any:`Port` to None. Lastly call :any:`QGraphicsScene.removeItem`
-        on the scene to remove this widget.
+        """Deletes the connection.
+
+        This function removes any connected ports by calling :any:`Port.remove_connection` for each port
+        connected to this connection. After all connections have been removed, the stored :any:`Port`
+        references are set to None. Finally, :any:`QGraphicsScene.removeItem` is called on the scene to
+        remove this widget.
+
+        Returns:
+            None
         """
 
         to_delete = []

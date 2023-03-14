@@ -6,7 +6,27 @@ from node_editor.gui.port import Port
 
 
 class NodeEditor(QtCore.QObject):
+    """
+    The main class of the node editor. This class handles the logic for creating, connecting, and deleting
+    nodes and connections.
+        :ivar connection: A Connection object representing the current connection being created.
+    :vartype connection: Connection
+    :ivar port: A Port object representing the current port being clicked for a new connection.
+    :vartype port: Port
+    :ivar scene: The QGraphicsScene on which the nodes and connections are drawn.
+    :vartype scene: QGraphicsScene
+    :ivar _last_selected: The last Node object that was selected.
+    :vartype _last_selected: Node
+    """
+
     def __init__(self, parent):
+        """
+        Constructor for NodeEditor.
+
+        :param parent: The parent widget.
+        :type parent: QWidget
+        """
+
         super(NodeEditor, self).__init__(parent)
         self.connection = None
         self.port = None
@@ -14,10 +34,26 @@ class NodeEditor(QtCore.QObject):
         self._last_selected = None
 
     def install(self, scene):
+        """
+        Installs the NodeEditor into a QGraphicsScene.
+
+        :param scene: The QGraphicsScene to install the NodeEditor into.
+        :type scene: QGraphicsScene
+        """
+
         self.scene = scene
         self.scene.installEventFilter(self)
 
     def item_at(self, position):
+        """
+        Returns the QGraphicsItem at the given position.
+
+        :param position: The position to check for a QGraphicsItem.
+        :type position: QPoint
+        :return: The QGraphicsItem at the position, or None if no item is found.
+        :rtype: QGraphicsItem
+        """
+
         items = self.scene.items(QtCore.QRectF(position - QtCore.QPointF(1, 1), QtCore.QSizeF(3, 3)))
 
         if items:
@@ -25,6 +61,16 @@ class NodeEditor(QtCore.QObject):
         return None
 
     def eventFilter(self, watched, event):
+        """
+        Filters events from the QGraphicsScene.
+
+        :param watched: The object that is watched.
+        :type watched: QObject
+        :param event: The event that is being filtered.
+        :type event: QEvent
+        :return: True if the event was filtered, False otherwise.
+        :rtype: bool
+        """
         if type(event) == QtWidgets.QWidgetItem:
             return False
 

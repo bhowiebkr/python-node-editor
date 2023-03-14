@@ -1,13 +1,8 @@
-# from PySide6.QtWidgets import QWidget, QVBoxLayout, QGraphicsScene
-
 from PySide6 import QtWidgets, QtGui
 
 from node_editor.gui.view import View
 from node_editor.gui.node import Node
 from node_editor.gui.node_editor import NodeEditor
-
-# import lorem
-# import random
 
 
 def create_input():
@@ -83,7 +78,22 @@ class NodeScene(QtWidgets.QGraphicsScene):
 
 
 class NodeWidget(QtWidgets.QWidget):
+    """
+    Widget for creating and displaying a node editor.
+
+    Attributes:
+        node_editor (NodeEditor): The node editor object.
+        scene (NodeScene): The scene object for the node editor.
+        view (View): The view object for the node editor.
+    """
+
     def __init__(self, parent):
+        """
+        Initializes the NodeWidget object.
+
+        Args:
+            parent (QWidget): The parent widget.
+        """
         super(NodeWidget, self).__init__(parent)
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -101,6 +111,12 @@ class NodeWidget(QtWidgets.QWidget):
         self.view.request_node.connect(self.create_node)
 
     def create_node(self, name):
+        """
+        Creates a new node and adds it to the node editor.
+
+        Args:
+            name (str): The name of the node to be created.
+        """
         print("creating node:", name)
 
         if name == "Input":
