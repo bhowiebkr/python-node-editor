@@ -10,8 +10,7 @@ I’ve thought about extending some functionality to this that would be useful f
 - Run python code for each node into its own thread when calculating a DAG graph. This would speed processing up on multithreaded systems. And would be nice as a core feature. 
 
 
-Let me know what your thoughts are and open an issue to discuss it. I’d like to keep features as open, generalized, and simple as possible.
+Let me know what your thoughts are and open a thread in the Discussions tab in github on this repo. I’d like to keep features as open, generalized, and simple as possible.
 
-Example video: https://www.youtube.com/watch?v=DOsFJ8lm9dU
-
+[![Video](http://img.youtube.com/vi/DOsFJ8lm9dU/0.jpg)](http://www.youtube.com/watch?v=DOsFJ8lm9dU)
 ![nodes](https://github.com/bhowiebkr/simple-node-editor/blob/master/images/node_editor.jpg)
