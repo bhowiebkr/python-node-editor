@@ -10,29 +10,20 @@ Author: Bryan Howard
 Repo: https://github.com/bhowiebkr/simple-node-editor
 """
 
-import sys
-
-from PySide6 import QtWidgets, QtCore, QtGui
-
 import logging
-import os
 
-from node_editor.gui.node_widget import NodeWidget
+from PySide6 import QtCore, QtGui, QtWidgets
+
 from node_editor.gui.node_list import NodeList
 from node_editor.gui.node_type_editor import NodeTypeEditor
+from node_editor.gui.node_widget import NodeWidget
 
 logging.basicConfig(level=logging.DEBUG)
-
-import importlib
-
-# Import qdarktheme if you have it. If not install it with pip. Dark Themese are great!
-if importlib.util.find_spec("qdarktheme") is not None:
-    import qdarktheme
 
 
 class NodeEditor(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
-        super(NodeEditor, self).__init__(parent)
+        super().__init__(parent)
         self.settings = None
 
         icon = QtGui.QIcon("resources\\app.ico")
@@ -106,6 +97,10 @@ class NodeEditor(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
+    import sys
+
+    import qdarktheme
+
     app = QtWidgets.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("resources\\app.ico"))
     qdarktheme.setup_theme()
