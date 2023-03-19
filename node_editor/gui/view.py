@@ -55,8 +55,8 @@ class View(QtWidgets.QGraphicsView):
         if self._pan:
             return
 
-        num_degrees = event.delta() / 8.0
-        num_steps = num_degrees / 5.0
+        num_degrees = event.angleDelta() / 8.0
+        num_steps = num_degrees.y() / 5.0
         self._numScheduledScalings += num_steps
 
         # If the user moved the wheel another direction, we reset previously scheduled scalings
