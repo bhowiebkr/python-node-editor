@@ -1,8 +1,8 @@
-from PySide6 import QtWidgets, QtGui
+from PySide6 import QtGui, QtWidgets
 
-from node_editor.gui.view import View
 from node_editor.gui.node import Node
 from node_editor.gui.node_editor import NodeEditor
+from node_editor.gui.view import View
 
 
 def create_input():
@@ -69,7 +69,7 @@ class NodeScene(QtWidgets.QGraphicsScene):
     def dropEvent(self, e):
         # find item at these coordinates
         item = self.itemAt(e.scenePos())
-        if item.setAcceptDrops == True:
+        if item.setAcceptDrops:
             # pass on event to item at the coordinates
             item.dropEvent(e)
 
@@ -94,7 +94,7 @@ class NodeWidget(QtWidgets.QWidget):
         Args:
             parent (QWidget): The parent widget.
         """
-        super(NodeWidget, self).__init__(parent)
+        super().__init__(parent)
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(main_layout)

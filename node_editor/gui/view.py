@@ -1,6 +1,5 @@
-from PySide6 import QtCore, QtGui, QtWidgets, QtOpenGLWidgets
+from PySide6 import QtCore, QtGui, QtOpenGLWidgets, QtWidgets
 
-from node_editor.gui.connection import Connection
 from node_editor.gui.node import Node
 
 
@@ -22,7 +21,7 @@ class View(QtWidgets.QGraphicsView):
     request_node = QtCore.Signal(str)
 
     def __init__(self, parent):
-        super(View, self).__init__(parent)
+        super().__init__(parent)
         self.setRenderHint(QtGui.QPainter.Antialiasing)
         self._manipulationMode = 0
 
@@ -144,7 +143,7 @@ class View(QtWidgets.QGraphicsView):
             y += self._grid_size_course
         painter.drawLines(gridLines)
 
-        return super(View, self).drawBackground(painter, rect)
+        return super().drawBackground(painter, rect)
 
     def contextMenuEvent(self, event):
         """
@@ -199,7 +198,7 @@ class View(QtWidgets.QGraphicsView):
             self._pan_start_y = event.y()
             self.setCursor(QtCore.Qt.ClosedHandCursor)
 
-        return super(View, self).mousePressEvent(event)
+        return super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
         """
@@ -210,7 +209,7 @@ class View(QtWidgets.QGraphicsView):
             self._pan = False
             self.setCursor(QtCore.Qt.ArrowCursor)
 
-        return super(View, self).mouseReleaseEvent(event)
+        return super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event):
         """
@@ -225,4 +224,4 @@ class View(QtWidgets.QGraphicsView):
             self._pan_start_x = event.x()
             self._pan_start_y = event.y()
 
-        return super(View, self).mouseMoveEvent(event)
+        return super().mouseMoveEvent(event)

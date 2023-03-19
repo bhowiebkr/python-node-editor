@@ -1,9 +1,9 @@
-from PySide6 import QtWidgets, QtCore, QtGui
+from PySide6 import QtCore, QtGui, QtWidgets
 
 
 class NodeList(QtWidgets.QListWidget):
     def __init__(self, parent=None):
-        super(NodeList, self).__init__(parent)
+        super().__init__(parent)
 
         for node in ["Input", "Output", "And", "Not", "Nor", "Empty"]:
             item = QtWidgets.QListWidgetItem(node)
@@ -27,4 +27,4 @@ class NodeList(QtWidgets.QListWidget):
             drag.setPixmap(pixmap)
             drag.exec_()
 
-            super(NodeList, self).mousePressEvent(event)
+            super().mousePressEvent(event)

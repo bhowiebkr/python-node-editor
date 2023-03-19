@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets, QtGui, QtCore
+from PySide6 import QtCore, QtGui, QtWidgets
 
 
 class Connection(QtWidgets.QGraphicsPathItem):
@@ -27,7 +27,7 @@ class Connection(QtWidgets.QGraphicsPathItem):
     """
 
     def __init__(self, parent):
-        super(Connection, self).__init__(parent)
+        super().__init__(parent)
 
         self.setFlag(QtWidgets.QGraphicsPathItem.ItemIsSelectable)
 

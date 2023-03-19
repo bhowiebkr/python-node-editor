@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets, QtGui, QtCore
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from node_editor.gui.port import Port
 
@@ -35,7 +35,7 @@ class Node(QtWidgets.QGraphicsPathItem):
     """
 
     def __init__(self):
-        super(Node, self).__init__()
+        super().__init__()
 
         self.setFlag(QtWidgets.QGraphicsPathItem.ItemIsMovable)
         self.setFlag(QtWidgets.QGraphicsPathItem.ItemIsSelectable)
@@ -84,10 +84,9 @@ class Node(QtWidgets.QGraphicsPathItem):
 
         if self.isSelected():
             painter.setPen(QtGui.QPen(QtGui.QColor(241, 175, 0), 2))
-            painter.setBrush(self.node_color)
         else:
             painter.setPen(self.node_color.lighter())
-            painter.setBrush(self.node_color)
+        painter.setBrush(self.node_color)
 
         painter.drawPath(self.path())
         painter.setPen(QtCore.Qt.NoPen)
@@ -137,7 +136,6 @@ class Node(QtWidgets.QGraphicsPathItem):
         self.misc_path = QtGui.QPainterPath()  # a bunch of other stuff
 
         total_width = 0
-        total_height = 0
         path = QtGui.QPainterPath()  # The main path
 
         # The fonts what will be used
@@ -152,7 +150,7 @@ class Node(QtWidgets.QGraphicsPathItem):
         }
 
         title_type_dim = {
-            "w": QtGui.QFontMetrics(title_type_font).horizontalAdvance("(" + self._type_text + ")"),
+            "w": QtGui.QFontMetrics(title_type_font).horizontalAdvance(f"({self._type_text})"),
             "h": QtGui.QFontMetrics(title_type_font).height(),
         }
 
@@ -162,8 +160,7 @@ class Node(QtWidgets.QGraphicsPathItem):
                 total_width = dim
 
         # Add both the title and type height together for the total height
-        for dim in [title_dim["h"], title_type_dim["h"]]:
-            total_height += dim
+        total_height = sum([title_dim["h"], title_type_dim["h"]])
 
         port_dim = None
         # Add the heigth for each of the ports
@@ -198,7 +195,7 @@ class Node(QtWidgets.QGraphicsPathItem):
             -title_type_dim["w"] / 2,
             (-total_height / 2) + title_dim["h"] + title_type_dim["h"],
             title_type_font,
-            "(" + self._type_text + ")",
+            f"({self._type_text})",
         )
 
         if port_dim:
@@ -280,12 +277,7 @@ class Node(QtWidgets.QGraphicsPathItem):
             None
         """
 
-        to_delete = []
-
-        for port in self._ports:
-            if port.connection:
-                to_delete.append(port.connection)
-
+        to_delete = [port.connection for port in self._ports if port.connection]
         for connection in to_delete:
             connection.delete()
 

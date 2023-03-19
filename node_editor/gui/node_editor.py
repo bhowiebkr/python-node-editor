@@ -1,4 +1,6 @@
-from PySide6 import QtWidgets, QtCore
+from contextlib import suppress
+
+from PySide6 import QtCore, QtWidgets
 
 from node_editor.gui.connection import Connection
 from node_editor.gui.node import Node
@@ -27,7 +29,7 @@ class NodeEditor(QtCore.QObject):
         :type parent: QWidget
         """
 
-        super(NodeEditor, self).__init__(parent)
+        super().__init__(parent)
         self.connection = None
         self.port = None
         self.scene = None
@@ -55,10 +57,7 @@ class NodeEditor(QtCore.QObject):
         """
 
         items = self.scene.items(QtCore.QRectF(position - QtCore.QPointF(1, 1), QtCore.QSizeF(3, 3)))
-
-        if items:
-            return items[0]
-        return None
+        return items[0] if items else None
 
     def eventFilter(self, watched, event):
         """
@@ -87,7 +86,7 @@ class NodeEditor(QtCore.QObject):
                     self.connection.update_path()
                     return True
 
-                elif isinstance(item, Connection):
+                if isinstance(item, Connection):
                     self.connection = Connection(None)
                     self.connection.start_pos = item.start_pos
                     self.scene.addItem(self.connection)
@@ -96,24 +95,15 @@ class NodeEditor(QtCore.QObject):
                     self.connection.update_start_and_end_pos()  # to fix the offset
                     return True
 
-                elif isinstance(item, Node):
-                    if self._last_selected:
-                        # If we clear the scene, we loose the last selection
-                        try:
-                            self._last_selected.select_connections(False)
-                        except RuntimeError:
-                            pass
+                if self._last_selected:
+                    # If we clear the scene, we loose the last selection
+                    with suppress(RuntimeError):
+                        self._last_selected.select_connections(False)
 
+                if isinstance(item, Node):
                     item.select_connections(True)
                     self._last_selected = item
-
                 else:
-                    try:
-                        if self._last_selected:
-                            self._last_selected.select_connections(False)
-                    except RuntimeError:
-                        pass
-
                     self._last_selected = None
 
             elif event.button() == QtCore.Qt.RightButton:
@@ -152,15 +142,13 @@ class NodeEditor(QtCore.QObject):
                         item.clear_connection()
 
                         self.connection.start_port = self.port
-
                         self.connection.end_port = item
-
                         self.connection.update_start_and_end_pos()
-                        self.connection = None
                     else:
                         print("Deleting connection")
                         self.connection.delete()
-                        self.connection = None
+
+                    self.connection = None
 
                 if self.connection:
                     self.connection.delete()
@@ -168,4 +156,4 @@ class NodeEditor(QtCore.QObject):
                 self.port = None
                 return True
 
-        return super(NodeEditor, self).eventFilter(watched, event)
+        return super().eventFilter(watched, event)

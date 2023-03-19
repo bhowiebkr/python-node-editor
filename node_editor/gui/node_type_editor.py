@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets, QtGui
+from PySide6 import QtWidgets
 
 
 class NodeTypeEditor(QtWidgets.QDialog):
