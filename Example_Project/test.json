@@ -1,0 +1,48 @@
+{
+    "nodes": [
+        {
+            "type": "Add_Node",
+            "x": 5012,
+            "y": 4886,
+            "uuid": "be2827cf-6e4a-4902-b3f7-3c0d9c19ef2f"
+        },
+        {
+            "type": "Add_Node",
+            "x": 4807,
+            "y": 5164,
+            "uuid": "69ef5cfe-9f44-411b-83d6-f6aa8790d92e"
+        },
+        {
+            "type": "Add_Node",
+            "x": 4494,
+            "y": 4991,
+            "uuid": "cc0a484c-c044-4dce-89a0-cab99bb0becb"
+        },
+        {
+            "type": "Add_Node",
+            "x": 4639,
+            "y": 4847,
+            "uuid": "85902a44-f54d-4c46-ac76-b58e365daa06"
+        }
+    ],
+    "connections": [
+        {
+            "start_id": "69ef5cfe-9f44-411b-83d6-f6aa8790d92e",
+            "end_id": "be2827cf-6e4a-4902-b3f7-3c0d9c19ef2f",
+            "start_port": "output",
+            "end_port": "input B"
+        },
+        {
+            "start_id": "85902a44-f54d-4c46-ac76-b58e365daa06",
+            "end_id": "be2827cf-6e4a-4902-b3f7-3c0d9c19ef2f",
+            "start_port": "output",
+            "end_port": "input A"
+        },
+        {
+            "start_id": "cc0a484c-c044-4dce-89a0-cab99bb0becb",
+            "end_id": "85902a44-f54d-4c46-ac76-b58e365daa06",
+            "start_port": "output",
+            "end_port": "input B"
+        }
+    ]
+}
