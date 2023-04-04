@@ -46,6 +46,7 @@ class Node(QtWidgets.QGraphicsPathItem):
         self._width = 30  # The Width of the node
         self._height = 30  # the height of the node
         self._ports = []  # A list of ports
+        self.uuid = None  # An identifier to used when saving and loading the scene
 
         self.node_color = QtGui.QColor(20, 20, 20, 200)
 
