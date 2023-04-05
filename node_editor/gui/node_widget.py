@@ -1,5 +1,7 @@
 import json
 import uuid
+from collections import OrderedDict
+
 from PySide6 import QtGui, QtWidgets
 
 from node_editor.gui.node import Node
@@ -44,6 +46,8 @@ class NodeWidget(QtWidgets.QWidget):
             parent (QWidget): The parent widget.
         """
         super().__init__(parent)
+
+        self.node_lookup = {}  # A dictionary of nodes, by uuids for faster looking up. Refactor this in the future
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(main_layout)
@@ -65,8 +69,45 @@ class NodeWidget(QtWidgets.QWidget):
         pos = self.view.mapFromGlobal(QtGui.QCursor.pos())
         node.setPos(self.view.mapToScene(pos))
 
+    def load_scene(self, json_path, imports):
+        # load the scene json file
+        data = None
+        with open(json_path) as f:
+            data = json.load(f)
+
+        # clear out the node lookup
+        self.node_lookup = {}
+
+        # Add the nodes
+        if data:
+            for node in data["nodes"]:
+                info = imports[node["type"]]
+                node_item = info["class"]()
+                node_item.uuid = node["uuid"]
+                self.scene.addItem(node_item)
+                node_item.setPos(node["x"], node["y"])
+
+                self.node_lookup[node["uuid"]] = node_item
+
+        # Add the connections
+        for c in data["connections"]:
+            connection = Connection(None)
+            self.scene.addItem(connection)
+
+            start_port = self.node_lookup[c["start_id"]].get_port(c["start_port"])
+            end_port = self.node_lookup[c["end_id"]].get_port(c["end_port"])
+
+            connection.start_port = start_port
+            connection.end_port = end_port
+            connection.update_start_and_end_pos()
+
     def save_project(self, json_path):
         # print(f"json path: {json_path}")
+
+        from collections import OrderedDict
+
+        # TODO possibly an ordered dict so things stay in order (better for git changes, and manual editing)
+        # Maybe connections will need a uuid for each so they can be sorted and kept in order.
         scene = {"nodes": [], "connections": []}
 
         # Need the nodes, and connections of ports to nodes
@@ -97,13 +138,13 @@ class NodeWidget(QtWidgets.QWidget):
 
             # Nodes
             if isinstance(item, Node):
-                print("found node")
+                # print("found node")
                 pos = item.pos().toPoint()
                 x, y = pos.x(), pos.y()
-                print(f"pos: {x, y}")
+                # print(f"pos: {x, y}")
 
                 obj_type = type(item).__name__
-                print(f"node type: {obj_type}")
+                # print(f"node type: {obj_type}")
 
                 node_id = str(item.uuid)
 
