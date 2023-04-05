@@ -80,7 +80,7 @@ class Connection(QtWidgets.QGraphicsPathItem):
         Returns:
         tuple: A tuple of the two Node objects connected by this Connection.
         """
-        return (self._start_port().node(), self._end_port().node())
+        return (self._start_port.node(), self._end_port.node())
 
     def update_start_and_end_pos(self):
         """
