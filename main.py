@@ -43,7 +43,7 @@ class NodeEditor(QtWidgets.QMainWindow):
         self.menuBar().addMenu(file_menu)
 
         load_action = QtGui.QAction("Load Project", self)
-        load_action.triggered.connect(self.load_project)
+        load_action.triggered.connect(self.get_project_path)
         file_menu.addAction(load_action)
 
         save_action = QtGui.QAction("Save Project", self)
@@ -71,8 +71,9 @@ class NodeEditor(QtWidgets.QMainWindow):
         left_layout.addWidget(self.node_list)
         main_layout.addWidget(self.splitter)
 
-        # Signals
-        self.load_project("C:/Users/Howard/simple-node-editor/Example_project")
+        # Load the example project
+        example_project_path = (Path(__file__).parent.resolve() / 'Example_project')
+        self.load_project(example_project_path)
 
         # Restore GUI from last state
         if settings.contains("geometry"):
