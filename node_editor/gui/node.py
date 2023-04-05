@@ -97,6 +97,11 @@ class Node(QtWidgets.QGraphicsPathItem):
         painter.drawPath(self.type_path)
         painter.drawPath(self.misc_path)
 
+    def get_port(self, name):
+        for port in self._ports:
+            if port.name() == name:
+                return port
+
     def add_port(self, name, is_output=False, flags=0, ptr=None):
         """
         Adds a new port to the node.
