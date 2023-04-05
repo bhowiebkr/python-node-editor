@@ -12,6 +12,8 @@ Repo: https://github.com/bhowiebkr/simple-node-editor
 
 import logging
 from pathlib import Path
+import importlib
+import inspect
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
@@ -29,6 +31,7 @@ class NodeEditor(QtWidgets.QMainWindow):
         super().__init__(parent)
         self.settings = None
         self.project_path = None
+        self.imports = None  # we will store the project import node types here for now.
 
         icon = QtGui.QIcon("resources\\app.ico")
         self.setWindowIcon(icon)
@@ -74,7 +77,6 @@ class NodeEditor(QtWidgets.QMainWindow):
 
         # Signals
         new_node_type_btn.clicked.connect(self.new_node_cmd)
-        self.OnProjectPathUpdate.connect(self.node_list.update_project_path)
 
         self.load_project("C:/Users/Howard/simple-node-editor/Example_project")
 
@@ -100,7 +102,25 @@ class NodeEditor(QtWidgets.QMainWindow):
         project_path = Path(project_path)
         if project_path.exists() and project_path.is_dir():
             self.project_path = project_path
-            self.OnProjectPathUpdate.emit(project_path)
+
+            self.imports = {}
+
+            for file in project_path.glob("*.py"):
+                spec = importlib.util.spec_from_file_location(file.stem, file)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+
+                for name, obj in inspect.getmembers(module):
+                    if inspect.isclass(obj):
+                        self.imports[obj.__name__] = {"class": obj, "module": module}
+                        break
+
+            self.node_list.update_project(self.imports)
+
+            # work on just the first json file. add the ablitity to work on multiple json files later
+            for json_path in project_path.glob("*.json"):
+                self.node_widget.load_scene(json_path, self.imports)
+                break
 
     def get_project_path(self):
         project_path = QtWidgets.QFileDialog.getExistingDirectory(None, "Select Project Folder", "")
@@ -135,7 +155,7 @@ class NodeEditor(QtWidgets.QMainWindow):
         """
 
         # debugging lets save the scene:
-        self.node_widget.save_project("C:/Users/Howard/simple-node-editor/Example_Project/test.json")
+        # self.node_widget.save_project("C:/Users/Howard/simple-node-editor/Example_Project/test.json")
 
         self.settings = QtCore.QSettings("node-editor", "NodeEditor")
         self.settings.setValue("geometry", self.saveGeometry())
