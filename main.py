@@ -11,26 +11,44 @@ Repo: https://github.com/bhowiebkr/simple-node-editor
 """
 
 import logging
+from pathlib import Path
+import importlib
+import inspect
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from node_editor.gui.node_list import NodeList
-from node_editor.gui.node_type_editor import NodeTypeEditor
 from node_editor.gui.node_widget import NodeWidget
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 class NodeEditor(QtWidgets.QMainWindow):
+    OnProjectPathUpdate = QtCore.Signal(Path)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.settings = None
+        self.project_path = None
+        self.imports = None  # we will store the project import node types here for now.
 
         icon = QtGui.QIcon("resources\\app.ico")
         self.setWindowIcon(icon)
 
         self.setWindowTitle("Simple Node Editor")
         settings = QtCore.QSettings("node-editor", "NodeEditor")
+
+        # create a "File" menu and add an "Export CSV" action to it
+        file_menu = QtWidgets.QMenu("File", self)
+        self.menuBar().addMenu(file_menu)
+
+        load_action = QtGui.QAction("Load Project", self)
+        load_action.triggered.connect(self.load_project)
+        file_menu.addAction(load_action)
+
+        save_action = QtGui.QAction("Save Project", self)
+        save_action.triggered.connect(self.save_project)
+        file_menu.addAction(save_action)
 
         # Layouts
         main_widget = QtWidgets.QWidget()
@@ -41,23 +59,20 @@ class NodeEditor(QtWidgets.QMainWindow):
         left_layout.setContentsMargins(0, 0, 0, 0)
 
         # Widgets
-        self.node_list = NodeList()
+        self.node_list = NodeList(self)
         left_widget = QtWidgets.QWidget()
         self.splitter = QtWidgets.QSplitter()
         self.node_widget = NodeWidget(self)
-        new_node_type_btn = QtWidgets.QPushButton("New Node Type")
-        new_node_type_btn.setFixedHeight(50)
 
         # Add Widgets to layouts
         self.splitter.addWidget(left_widget)
         self.splitter.addWidget(self.node_widget)
         left_widget.setLayout(left_layout)
         left_layout.addWidget(self.node_list)
-        left_layout.addWidget(new_node_type_btn)
         main_layout.addWidget(self.splitter)
 
-        # Logic
-        new_node_type_btn.clicked.connect(self.new_node_cmd)
+        # Signals
+        self.load_project("C:/Users/Howard/simple-node-editor/Example_project")
 
         # Restore GUI from last state
         if settings.contains("geometry"):
@@ -66,19 +81,47 @@ class NodeEditor(QtWidgets.QMainWindow):
             s = settings.value("splitterSize")
             self.splitter.restoreState(s)
 
-    def new_node_cmd(self):
-        """
-        Handles the New Node Type button click event by showing the NodeTypeEditor dialog.
+    def save_project(self):
+        file_dialog = QtWidgets.QFileDialog()
+        file_dialog.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
+        file_dialog.setDefaultSuffix("json")
+        file_dialog.setNameFilter("JSON files (*.json)")
+        file_path, _ = file_dialog.getSaveFileName()
+        self.node_widget.save_project(file_path)
 
-        Returns:
-            None.
-        """
-        node_editor = NodeTypeEditor()
+    def load_project(self, project_path=None):
+        if not project_path:
+            return
 
-        if node_editor.exec() == QtWidgets.QDialog.Accepted:
-            print("Dialog accepted")
-        else:
-            print("Dialog canceled")
+        project_path = Path(project_path)
+        if project_path.exists() and project_path.is_dir():
+            self.project_path = project_path
+
+            self.imports = {}
+
+            for file in project_path.glob("*.py"):
+                spec = importlib.util.spec_from_file_location(file.stem, file)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+
+                for name, obj in inspect.getmembers(module):
+                    if inspect.isclass(obj):
+                        self.imports[obj.__name__] = {"class": obj, "module": module}
+                        break
+
+            self.node_list.update_project(self.imports)
+
+            # work on just the first json file. add the ablitity to work on multiple json files later
+            for json_path in project_path.glob("*.json"):
+                self.node_widget.load_scene(json_path, self.imports)
+                break
+
+    def get_project_path(self):
+        project_path = QtWidgets.QFileDialog.getExistingDirectory(None, "Select Project Folder", "")
+        if not project_path:
+            return
+
+        self.load_project(project_path)
 
     def closeEvent(self, event):
         """
@@ -90,6 +133,10 @@ class NodeEditor(QtWidgets.QMainWindow):
         Returns:
             None.
         """
+
+        # debugging lets save the scene:
+        # self.node_widget.save_project("C:/Users/Howard/simple-node-editor/Example_Project/test.json")
+
         self.settings = QtCore.QSettings("node-editor", "NodeEditor")
         self.settings.setValue("geometry", self.saveGeometry())
         self.settings.setValue("splitterSize", self.splitter.saveState())

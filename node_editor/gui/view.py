@@ -18,7 +18,7 @@ class View(QtWidgets.QGraphicsView):
 
     _mouse_wheel_zoom_rate = 0.0015
 
-    request_node = QtCore.Signal(str)
+    request_node = QtCore.Signal(object)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -184,8 +184,8 @@ class View(QtWidgets.QGraphicsView):
         This method is called when a drag and drop event is dropped onto the view. It retrieves the name of the dropped node
         from the mime data and emits a signal to request the creation of the corresponding node.
         """
-        drop_node_name = e.mimeData().text()
-        self.request_node.emit(drop_node_name)
+        node = e.mimeData().item.class_name
+        self.request_node.emit(node())
 
     def mousePressEvent(self, event):
         """

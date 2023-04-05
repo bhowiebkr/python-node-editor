@@ -1,0 +1,84 @@
+{
+    "nodes": [
+        {
+            "type": "Add_Node",
+            "x": 5374,
+            "y": 4897,
+            "uuid": "6e09cc9a-8b79-4129-bf61-637c6b8eb39b"
+        },
+        {
+            "type": "Add_Node",
+            "x": 5165,
+            "y": 5007,
+            "uuid": "0fe0381a-29bc-4987-ba94-ba4a14e33a13"
+        },
+        {
+            "type": "Add_Node",
+            "x": 4949,
+            "y": 4926,
+            "uuid": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b"
+        },
+        {
+            "type": "Add_Node",
+            "x": 4943,
+            "y": 5114,
+            "uuid": "e06066a5-6375-4a40-8d14-c7e5e9c28f02"
+        },
+        {
+            "type": "Add_Node",
+            "x": 4617,
+            "y": 5014,
+            "uuid": "a06586f8-3c66-48ca-8be7-fd99b9ee82c3"
+        },
+        {
+            "type": "Add_Node",
+            "x": 4666,
+            "y": 4864,
+            "uuid": "24ac8fd5-b91a-4c35-bfdc-bf96961da280"
+        },
+        {
+            "type": "Add_Node",
+            "x": 4794,
+            "y": 5130,
+            "uuid": "f20b2350-0bc9-40be-9ddd-510d16ae8cc8"
+        }
+    ],
+    "connections": [
+        {
+            "start_id": "24ac8fd5-b91a-4c35-bfdc-bf96961da280",
+            "end_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
+            "start_port": "output",
+            "end_port": "input A"
+        },
+        {
+            "start_id": "a06586f8-3c66-48ca-8be7-fd99b9ee82c3",
+            "end_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
+            "start_port": "output",
+            "end_port": "input B"
+        },
+        {
+            "start_id": "e06066a5-6375-4a40-8d14-c7e5e9c28f02",
+            "end_id": "0fe0381a-29bc-4987-ba94-ba4a14e33a13",
+            "start_port": "output",
+            "end_port": "input B"
+        },
+        {
+            "start_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
+            "end_id": "0fe0381a-29bc-4987-ba94-ba4a14e33a13",
+            "start_port": "output",
+            "end_port": "input A"
+        },
+        {
+            "start_id": "0fe0381a-29bc-4987-ba94-ba4a14e33a13",
+            "end_id": "6e09cc9a-8b79-4129-bf61-637c6b8eb39b",
+            "start_port": "output",
+            "end_port": "input B"
+        },
+        {
+            "start_id": "f20b2350-0bc9-40be-9ddd-510d16ae8cc8",
+            "end_id": "e06066a5-6375-4a40-8d14-c7e5e9c28f02",
+            "start_port": "output",
+            "end_port": "input B"
+        }
+    ]
+}
