@@ -9,20 +9,13 @@ class NodeList(QtWidgets.QListWidget):
         super().__init__(parent)
         self.setDragEnabled(True)  # enable dragging
 
-    def update_project_path(self, project_path):
-        print("project path updated")
-        for file in project_path.glob("*.py"):
-            print(f"File: {file.stem}")
-            spec = importlib.util.spec_from_file_location(file.stem, file)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
+    def update_project(self, imports):
+        # make an item for each custom  class
 
-            item = QtWidgets.QListWidgetItem(file.stem)
-            item.module = module
-            for name, obj in inspect.getmembers(module):
-                if inspect.isclass(obj):
-                    item.class_name = obj
-                    break
+        for name, data in imports.items():
+            item = QtWidgets.QListWidgetItem(name)
+            item.module = data["module"]
+            item.class_name = data["class"]
             self.addItem(item)
 
     def mousePressEvent(self, event):
