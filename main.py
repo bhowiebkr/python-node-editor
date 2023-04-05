@@ -63,15 +63,12 @@ class NodeEditor(QtWidgets.QMainWindow):
         left_widget = QtWidgets.QWidget()
         self.splitter = QtWidgets.QSplitter()
         self.node_widget = NodeWidget(self)
-        new_node_type_btn = QtWidgets.QPushButton("New Node Type")
-        new_node_type_btn.setFixedHeight(50)
 
         # Add Widgets to layouts
         self.splitter.addWidget(left_widget)
         self.splitter.addWidget(self.node_widget)
         left_widget.setLayout(left_layout)
         left_layout.addWidget(self.node_list)
-        left_layout.addWidget(new_node_type_btn)
         main_layout.addWidget(self.splitter)
 
         # Signals
