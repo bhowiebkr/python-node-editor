@@ -18,7 +18,6 @@ import inspect
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from node_editor.gui.node_list import NodeList
-from node_editor.gui.node_type_editor import NodeTypeEditor
 from node_editor.gui.node_widget import NodeWidget
 
 logging.basicConfig(level=logging.DEBUG)
@@ -76,8 +75,6 @@ class NodeEditor(QtWidgets.QMainWindow):
         main_layout.addWidget(self.splitter)
 
         # Signals
-        new_node_type_btn.clicked.connect(self.new_node_cmd)
-
         self.load_project("C:/Users/Howard/simple-node-editor/Example_project")
 
         # Restore GUI from last state
@@ -128,20 +125,6 @@ class NodeEditor(QtWidgets.QMainWindow):
             return
 
         self.load_project(project_path)
-
-    def new_node_cmd(self):
-        """
-        Handles the New Node Type button click event by showing the NodeTypeEditor dialog.
-
-        Returns:
-            None.
-        """
-        node_editor = NodeTypeEditor()
-
-        if node_editor.exec() == QtWidgets.QDialog.Accepted:
-            print("Dialog accepted")
-        else:
-            print("Dialog canceled")
 
     def closeEvent(self, event):
         """
