@@ -1,5 +1,4 @@
-# Logic Node Editor
-
+# Python Node Editor
 
 The Node-Based Python Tool is a software tool that provides a new way to organize reusable Python code. This tool is implemented in custom node classes that can be easily connected to one another to form a dynamic network.
 
