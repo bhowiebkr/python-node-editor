@@ -37,8 +37,22 @@ class Port(QtWidgets.QGraphicsPathItem):
         self.radius_ = 5
         self.margin = 2
 
+        self.execution = False
+
         path = QtGui.QPainterPath()
+        # if self.execution:
+        #     points = []
+        #     points.append(QtCore.QPointF(-6, -7))
+        #     points.append(QtCore.QPointF(-6, 7))
+        #     points.append(QtCore.QPointF(-2, 7))
+        #     points.append(QtCore.QPointF(6, 0))
+        #     points.append(QtCore.QPointF(-2, -7))
+        #     points.append(QtCore.QPointF(-6, -7))
+
+        #     path.addPolygon(QtGui.QPolygonF(points))
+        # else:
         path.addEllipse(-self.radius_, -self.radius_, 2 * self.radius_, 2 * self.radius_)
+
         self.setPath(path)
 
         self.setFlag(QtWidgets.QGraphicsPathItem.ItemSendsScenePositionChanges)
@@ -55,6 +69,25 @@ class Port(QtWidgets.QGraphicsPathItem):
         self.connection = None
 
         self.text_path = QtGui.QPainterPath()
+
+    def is_execution(self):
+        return self.execution
+
+    def set_execution(self, execution):
+        self.execution = execution
+
+        if execution:
+            path = QtGui.QPainterPath()
+
+            points = []
+            points.append(QtCore.QPointF(-6, -7))
+            points.append(QtCore.QPointF(-6, 7))
+            points.append(QtCore.QPointF(-2, 7))
+            points.append(QtCore.QPointF(6, 0))
+            points.append(QtCore.QPointF(-2, -7))
+            points.append(QtCore.QPointF(-6, -7))
+            path.addPolygon(QtGui.QPolygonF(points))
+            self.setPath(path)
 
     def set_is_output(self, is_output):
         self._is_output = is_output
@@ -76,12 +109,6 @@ class Port(QtWidgets.QGraphicsPathItem):
     def set_node(self, node):
         self.m_node = node
 
-    def set_port_flags(self, flags):
-        self.m_port_flags = flags
-
-    def set_ptr(self, ptr):
-        self.m_ptr = ptr
-
     def name(self):
         return self._name
 
@@ -92,17 +119,28 @@ class Port(QtWidgets.QGraphicsPathItem):
         return self.m_node
 
     def paint(self, painter, option=None, widget=None):
-        painter.setPen(QtCore.Qt.green)
+        if self.execution:
+            painter.setPen(QtCore.Qt.white)
+        else:
+            painter.setPen(QtCore.Qt.green)
 
         if self.is_connected():
-            painter.setBrush(QtCore.Qt.green)
+            if self.execution:
+                painter.setBrush(QtCore.Qt.white)
+            else:
+                painter.setBrush(QtCore.Qt.green)
+
         else:
             painter.setBrush(QtCore.Qt.NoBrush)
+
         painter.drawPath(self.path())
 
-        painter.setPen(QtCore.Qt.NoPen)
-        painter.setBrush(QtCore.Qt.white)
-        painter.drawPath(self.text_path)
+        # Draw text
+
+        if not self.execution:
+            painter.setPen(QtCore.Qt.NoPen)
+            painter.setBrush(QtCore.Qt.white)
+            painter.drawPath(self.text_path)
 
     def clear_connection(self):
         if self.connection:

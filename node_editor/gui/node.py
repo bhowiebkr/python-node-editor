@@ -118,7 +118,7 @@ class Node(QtWidgets.QGraphicsPathItem):
             if port.name() == name:
                 return port
 
-    def add_port(self, name, is_output=False, flags=0, ptr=None):
+    def add_port(self, name, is_output=False, execution=False):
         """
         Adds a new port to the node.
 
@@ -136,8 +136,7 @@ class Node(QtWidgets.QGraphicsPathItem):
         port.set_is_output(is_output)
         port.set_name(name)
         port.set_node(node=self)
-        port.set_port_flags(flags)
-        port.set_ptr(ptr)
+        port.set_execution(execution)
 
         self._ports.append(port)
 
@@ -186,15 +185,16 @@ class Node(QtWidgets.QGraphicsPathItem):
         port_dim = None
         # Add the heigth for each of the ports
         for port in self._ports:
-            port_dim = {
-                "w": QtGui.QFontMetrics(port_font).horizontalAdvance(port.name()),
-                "h": QtGui.QFontMetrics(port_font).height(),
-            }
+            if not port.is_execution():
+                port_dim = {
+                    "w": QtGui.QFontMetrics(port_font).horizontalAdvance(port.name()),
+                    "h": QtGui.QFontMetrics(port_font).height(),
+                }
 
-            if port_dim["w"] > total_width:
-                total_width = port_dim["w"]
+                if port_dim["w"] > total_width:
+                    total_width = port_dim["w"]
 
-            total_height += port_dim["h"]
+                total_height += port_dim["h"]
 
         # Add the margin to the total_width
         total_width += self.horizontal_margin
@@ -228,14 +228,16 @@ class Node(QtWidgets.QGraphicsPathItem):
         )
 
         if port_dim:
-            y = (-total_height / 2) + title_dim["h"] + title_type_dim["h"] + port_dim["h"]
+            y = (-total_height / 2) + title_dim["h"] + title_type_dim["h"] + 5
 
             for port in self._ports:
+                if not port.is_execution():
+                    y += port_dim["h"]
+
                 if port.is_output():
                     port.setPos(total_width / 2 - 10, y)
                 else:
                     port.setPos(-total_width / 2 + 10, y)
-                y += port_dim["h"]
 
         self.setPath(path)
 
