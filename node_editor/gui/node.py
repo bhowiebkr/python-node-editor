@@ -90,8 +90,14 @@ class Node(QtWidgets.QGraphicsPathItem):
         painter.setBrush(self.node_color)
         painter.drawPath(self.path())
 
-        painter.setBrush(self._title_color)
-        painter.setPen(self.node_color.lighter())
+        gradient = QtGui.QLinearGradient()
+        gradient.setStart(0, -90)
+        gradient.setFinalStop(0, 0)
+        gradient.setColorAt(0, self._title_color)  # Start color (white)
+        gradient.setColorAt(1, self._title_color.darker())  # End color (blue)
+
+        painter.setBrush(QtGui.QBrush(gradient))
+        painter.setPen(self._title_color)
         painter.drawPath(self.title_bg_path.simplified())
 
         painter.setPen(QtCore.Qt.NoPen)
