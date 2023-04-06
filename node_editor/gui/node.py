@@ -109,7 +109,7 @@ class Node(QtWidgets.QGraphicsPathItem):
 
         # Draw the highlight
         if self.isSelected():
-            painter.setPen(QtGui.QPen(QtGui.QColor(241, 175, 0), 2))
+            painter.setPen(QtGui.QPen(self._title_color.lighter(), 2))
             painter.setBrush(Qt.NoBrush)
             painter.drawPath(self.path())
 
