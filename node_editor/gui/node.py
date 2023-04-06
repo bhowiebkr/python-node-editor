@@ -1,4 +1,5 @@
 from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
 
 from node_editor.gui.port import Port
 
@@ -41,6 +42,8 @@ class Node(QtWidgets.QGraphicsPathItem):
         self.setFlag(QtWidgets.QGraphicsPathItem.ItemIsSelectable)
 
         self._title_text = "Title"
+        self._title_color = QtGui.QColor(123, 33, 177)
+
         self._type_text = "base"
 
         self._width = 30  # The Width of the node
@@ -83,19 +86,26 @@ class Node(QtWidgets.QGraphicsPathItem):
             widget (QWidget): The widget to use for drawing the node (optional).
         """
 
-        if self.isSelected():
-            painter.setPen(QtGui.QPen(QtGui.QColor(241, 175, 0), 2))
-        else:
-            painter.setPen(self.node_color.lighter())
+        painter.setPen(self.node_color.lighter())
         painter.setBrush(self.node_color)
-
         painter.drawPath(self.path())
+
+        painter.setBrush(self._title_color)
+        painter.setPen(self.node_color.lighter())
+        painter.drawPath(self.title_bg_path.simplified())
+
         painter.setPen(QtCore.Qt.NoPen)
         painter.setBrush(QtCore.Qt.white)
 
         painter.drawPath(self.title_path)
         painter.drawPath(self.type_path)
         painter.drawPath(self.misc_path)
+
+        # Draw the highlight
+        if self.isSelected():
+            painter.setPen(QtGui.QPen(QtGui.QColor(241, 175, 0), 2))
+            painter.setBrush(Qt.NoBrush)
+            painter.drawPath(self.path())
 
     def get_port(self, name):
         for port in self._ports:
@@ -143,9 +153,8 @@ class Node(QtWidgets.QGraphicsPathItem):
 
         total_width = 0
         path = QtGui.QPainterPath()  # The main path
-
         # The fonts what will be used
-        title_font = QtGui.QFont("Lucida Sans Unicode", pointSize=16)
+        title_font = QtGui.QFont("Lucida Sans Unicode", pointSize=12)
         title_type_font = QtGui.QFont("Lucida Sans Unicode", pointSize=8)
         port_font = QtGui.QFont("Lucida Sans Unicode")
 
@@ -156,7 +165,7 @@ class Node(QtWidgets.QGraphicsPathItem):
         }
 
         title_type_dim = {
-            "w": QtGui.QFontMetrics(title_type_font).horizontalAdvance(f"({self._type_text})"),
+            "w": QtGui.QFontMetrics(title_type_font).horizontalAdvance(f"{self._type_text}"),
             "h": QtGui.QFontMetrics(title_type_font).height(),
         }
 
@@ -188,20 +197,28 @@ class Node(QtWidgets.QGraphicsPathItem):
         # Draw the background rectangle
         path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, total_height, 5, 5)
 
+        # The color on the title
+        bg_height = 35
+        self.title_bg_path = QtGui.QPainterPath()  # The title background path
+        self.title_bg_path.setFillRule(Qt.WindingFill)
+        self.title_bg_path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, bg_height, 5, 5)
+        self.title_bg_path.addRect(-total_width / 2, -total_height / 2 + bg_height - 10, 10, 10)  # bottom left corner
+        self.title_bg_path.addRect(total_width / 2 - 10, -total_height / 2 + bg_height - 10, 10, 10)  # bottom right corner
+
         # Draw the title
         self.title_path.addText(
-            -title_dim["w"] / 2,
-            (-total_height / 2) + title_dim["h"],
+            -total_width / 2 + 5,
+            (-total_height / 2) + title_dim["h"] / 2 + 5,
             title_font,
             self._title_text,
         )
 
         # Draw the type
         self.type_path.addText(
-            -title_type_dim["w"] / 2,
-            (-total_height / 2) + title_dim["h"] + title_type_dim["h"],
+            -total_width / 2 + 5,
+            (-total_height / 2) + title_dim["h"] + 5,
             title_type_font,
-            f"({self._type_text})",
+            f"{self._type_text}",
         )
 
         if port_dim:
