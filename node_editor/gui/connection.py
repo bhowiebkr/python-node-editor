@@ -129,10 +129,17 @@ class Connection(QtWidgets.QGraphicsPathItem):
         option (QStyleOptionGraphicsItem): The style options for the Connection.
         widget (QWidget): The widget used to paint the Connection.
         """
+
+        thickness = 0
         color = QtGui.QColor(0, 128, 255)
+        if self._start_port:
+            if self._start_port.is_execution():
+                thickness = 3
+                color = QtGui.QColor(255, 255, 255)
+
         if self.isSelected() or self._do_highlight:
-            painter.setPen(QtGui.QPen(color.lighter(), 2))
+            painter.setPen(QtGui.QPen(color.lighter(), thickness + 2))
         else:
-            painter.setPen(QtGui.QPen(color, 0))
+            painter.setPen(QtGui.QPen(color, thickness))
 
         painter.drawPath(self.path())
