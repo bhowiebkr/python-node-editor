@@ -92,8 +92,12 @@ class Port(QtWidgets.QGraphicsPathItem):
         return self.m_node
 
     def paint(self, painter, option=None, widget=None):
-        painter.setPen(QtGui.QPen(1))
-        painter.setBrush(QtCore.Qt.green)
+        painter.setPen(QtCore.Qt.green)
+
+        if self.is_connected():
+            painter.setBrush(QtCore.Qt.green)
+        else:
+            painter.setBrush(QtCore.Qt.NoBrush)
         painter.drawPath(self.path())
 
         painter.setPen(QtCore.Qt.NoPen)
