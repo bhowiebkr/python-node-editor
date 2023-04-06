@@ -130,8 +130,8 @@ class Connection(QtWidgets.QGraphicsPathItem):
         widget (QWidget): The widget used to paint the Connection.
         """
         if self.isSelected() or self._do_highlight:
-            painter.setPen(QtGui.QPen(QtGui.QColor(255, 102, 0), 3))
+            painter.setPen(QtGui.QPen(QtGui.QColor(255, 102, 0), 2))
         else:
-            painter.setPen(QtGui.QPen(QtGui.QColor(0, 128, 255), 2))
+            painter.setPen(QtGui.QPen(QtGui.QColor(0, 128, 255), 0))
 
         painter.drawPath(self.path())
