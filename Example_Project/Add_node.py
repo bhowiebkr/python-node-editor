@@ -7,6 +7,7 @@ class Add_Node(Node):
 
         self.title = "Add"
         self.type_text = "Logic Nodes"
+        self.set_color(title_color=(0, 128, 0))
 
         self.add_port(name="Ex In", is_output=False, execution=True)
         self.add_port(name="Ex Out", is_output=True, execution=True)
