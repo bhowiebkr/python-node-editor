@@ -45,6 +45,9 @@ class Node(QtWidgets.QGraphicsItem):
         self._title_color = QtGui.QColor(123, 33, 177)
         self.size = QtCore.QRectF()  # Size of
 
+        self.widget = QtWidgets.QWidget()
+        self.widget.resize(0, 0)
+
         self._type_text = "base"
 
         self._width = 30  # The Width of the node
@@ -325,16 +328,7 @@ class Node(QtWidgets.QGraphicsItem):
         self.scene().removeItem(self)
 
     def init_widget(self):
-        # create the QWidget and add it to a QGraphicsProxyWidget
-        widget = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout()
-        label = QtWidgets.QPushButton("Button test")
-        layout.addWidget(label)
-        widget.setLayout(layout)
-        proxy = QtWidgets.QGraphicsProxyWidget()
-        proxy.setWidget(widget)
-
-        proxy.setParentItem(self)
+        print(self.widget.size())
 
     def compute(self):
         # Get the values from the input ports

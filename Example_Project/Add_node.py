@@ -1,3 +1,5 @@
+from PySide6 import QtWidgets
+
 from node_editor.gui.node import Node
 
 
@@ -17,3 +19,19 @@ class Add_Node(Node):
         self.add_port(name="input B", is_output=False)
         self.add_port(name="output", is_output=True)
         self.build()
+
+    def init_widget(self):
+        self.widget = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout()
+        label = QtWidgets.QPushButton("Button test")
+        layout.addWidget(label)
+        self.widget.setLayout(layout)
+
+        proxy = QtWidgets.QGraphicsProxyWidget()
+        proxy.setWidget(self.widget)
+        proxy.setParentItem(self)
+
+        super().init_widget()
+
+        # print(self.widget.layout().sizeHint())
+        # print(self.widget.size())
