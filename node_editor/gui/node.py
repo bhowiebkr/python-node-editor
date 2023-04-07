@@ -4,7 +4,7 @@ from PySide6.QtCore import Qt
 from node_editor.gui.port import Port
 
 
-class Node(QtWidgets.QGraphicsPathItem):
+class Node(QtWidgets.QGraphicsItem):
     """
     A QGraphicsPathItem representing a node in the node editor.
 
@@ -38,11 +38,12 @@ class Node(QtWidgets.QGraphicsPathItem):
     def __init__(self):
         super().__init__()
 
-        self.setFlag(QtWidgets.QGraphicsPathItem.ItemIsMovable)
-        self.setFlag(QtWidgets.QGraphicsPathItem.ItemIsSelectable)
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable)
 
         self._title_text = "Title"
         self._title_color = QtGui.QColor(123, 33, 177)
+        self.size = QtCore.QRectF()  # Size of
 
         self._type_text = "base"
 
@@ -59,6 +60,15 @@ class Node(QtWidgets.QGraphicsPathItem):
 
         self.horizontal_margin = 30  # horizontal margin
         self.vertical_margin = 15  # vertical margin
+
+        self.init_widget()
+
+    def boundingRect(self):
+        return self.size
+
+    def set_color(self, title_color=(123, 33, 177), background_color=(20, 20, 20, 200)):
+        self._title_color = QtGui.QColor(title_color[0], title_color[1], title_color[2])
+        self.node_color = QtGui.QColor(background_color[0], background_color[1], background_color[2])
 
     @property
     def title(self):
@@ -88,7 +98,7 @@ class Node(QtWidgets.QGraphicsPathItem):
 
         painter.setPen(self.node_color.lighter())
         painter.setBrush(self.node_color)
-        painter.drawPath(self.path())
+        painter.drawPath(self.path)
 
         gradient = QtGui.QLinearGradient()
         gradient.setStart(0, -90)
@@ -111,7 +121,7 @@ class Node(QtWidgets.QGraphicsPathItem):
         if self.isSelected():
             painter.setPen(QtGui.QPen(self._title_color.lighter(), 2))
             painter.setBrush(Qt.NoBrush)
-            painter.drawPath(self.path())
+            painter.drawPath(self.path)
 
     def get_port(self, name):
         for port in self._ports:
@@ -157,7 +167,7 @@ class Node(QtWidgets.QGraphicsPathItem):
         self.misc_path = QtGui.QPainterPath()  # a bunch of other stuff
 
         total_width = 0
-        path = QtGui.QPainterPath()  # The main path
+        self.path = QtGui.QPainterPath()  # The main path
         # The fonts what will be used
         title_font = QtGui.QFont("Lucida Sans Unicode", pointSize=12)
         title_type_font = QtGui.QFont("Lucida Sans Unicode", pointSize=8)
@@ -185,15 +195,15 @@ class Node(QtWidgets.QGraphicsPathItem):
         port_dim = None
         # Add the heigth for each of the ports
         for port in self._ports:
+            port_dim = {
+                "w": QtGui.QFontMetrics(port_font).horizontalAdvance(port.name()),
+                "h": QtGui.QFontMetrics(port_font).height(),
+            }
+
+            if port_dim["w"] > total_width:
+                total_width = port_dim["w"]
+
             if not port.is_execution():
-                port_dim = {
-                    "w": QtGui.QFontMetrics(port_font).horizontalAdvance(port.name()),
-                    "h": QtGui.QFontMetrics(port_font).height(),
-                }
-
-                if port_dim["w"] > total_width:
-                    total_width = port_dim["w"]
-
                 total_height += port_dim["h"]
 
         # Add the margin to the total_width
@@ -201,7 +211,8 @@ class Node(QtWidgets.QGraphicsPathItem):
         total_height += self.vertical_margin
 
         # Draw the background rectangle
-        path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, total_height, 5, 5)
+        self.size = QtCore.QRectF(-total_width / 2, -total_height / 2, total_width, total_height)
+        self.path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, total_height, 5, 5)
 
         # The color on the title
         bg_height = 35
@@ -227,6 +238,7 @@ class Node(QtWidgets.QGraphicsPathItem):
             f"{self._type_text}",
         )
 
+        # Position the ports. Execution ports stay on the same row
         if port_dim:
             y = (-total_height / 2) + title_dim["h"] + title_type_dim["h"] + 5
 
@@ -238,8 +250,6 @@ class Node(QtWidgets.QGraphicsPathItem):
                     port.setPos(total_width / 2 - 10, y)
                 else:
                     port.setPos(-total_width / 2 + 10, y)
-
-        self.setPath(path)
 
         self._width = total_width
         self._height = total_height
@@ -313,3 +323,24 @@ class Node(QtWidgets.QGraphicsPathItem):
             connection.delete()
 
         self.scene().removeItem(self)
+
+    def init_widget(self):
+        # create the QWidget and add it to a QGraphicsProxyWidget
+        widget = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout()
+        label = QtWidgets.QPushButton("Button test")
+        layout.addWidget(label)
+        widget.setLayout(layout)
+        proxy = QtWidgets.QGraphicsProxyWidget()
+        proxy.setWidget(widget)
+
+        proxy.setParentItem(self)
+
+    def compute(self):
+        # Get the values from the input ports
+
+        # Compute the value
+
+        # Signal output ports
+
+        pass
