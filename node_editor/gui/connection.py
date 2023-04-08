@@ -90,7 +90,7 @@ class Connection(QtWidgets.QGraphicsPathItem):
         """
 
         if self.start_port and not self.start_port.is_output():
-            print("flipping connection")
+            # print("flipping connection")
             temp = self.end_port
             self._end_port = self.start_port
             self._start_port = temp

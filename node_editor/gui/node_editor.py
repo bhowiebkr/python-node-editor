@@ -131,7 +131,7 @@ class NodeEditor(QtCore.QObject):
                 # connecting a port
                 if isinstance(item, Port):
                     if self.port.can_connect_to(item):
-                        print("Making connection")
+                        # print("Making connection")
 
                         # delete existing connection on the new port
                         if item.connection:
@@ -145,7 +145,7 @@ class NodeEditor(QtCore.QObject):
                         self.connection.end_port = item
                         self.connection.update_start_and_end_pos()
                     else:
-                        print("Deleting connection")
+                        # print("Deleting connection")
                         self.connection.delete()
 
                     self.connection = None

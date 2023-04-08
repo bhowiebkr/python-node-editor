@@ -147,7 +147,7 @@ class Port(QtWidgets.QGraphicsPathItem):
             self.connection.delete()
 
     def can_connect_to(self, port):
-        print(port.node(), self.node())
+        # print(port.node(), self.node())
         if not port:
             return False
         if port.node() == self.node():
