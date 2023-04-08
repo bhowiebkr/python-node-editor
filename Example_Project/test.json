@@ -2,59 +2,65 @@
     "nodes": [
         {
             "type": "Add_Node",
-            "x": 4990,
-            "y": 4941,
+            "x": 4974,
+            "y": 4947,
             "uuid": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b"
         },
         {
             "type": "Button_Node",
-            "x": 4652,
-            "y": 4899,
+            "x": 4734,
+            "y": 4894,
             "uuid": "32fa39d4-d90b-46ea-bcec-bbb52f12e217"
         },
         {
-            "type": "Add_Node",
-            "x": 4825,
-            "y": 5053,
-            "uuid": "610ee41c-45ff-486e-a074-cc88b2e282f6"
+            "type": "Scaler_Node",
+            "x": 4740,
+            "y": 5013,
+            "uuid": "99788e6a-af8c-4b31-bdc3-b7c275743bb2"
         },
         {
-            "type": "Add_Node",
-            "x": 5189,
-            "y": 4936,
-            "uuid": "7f781f85-a9dd-4d28-ba79-91bb69c9254a"
+            "type": "Print_Node",
+            "x": 5178,
+            "y": 4946,
+            "uuid": "4d4c8ab7-4047-4d3c-a00d-afec8d2d2ab4"
+        },
+        {
+            "type": "Scaler_Node",
+            "x": 4733,
+            "y": 5122,
+            "uuid": "fb254b28-ef69-4fc1-8619-ed4fd0581689"
         }
     ],
     "connections": [
         {
             "start_id": "32fa39d4-d90b-46ea-bcec-bbb52f12e217",
             "end_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
+            "start_port": "Ex Out",
+            "end_port": "Ex In"
+        },
+        {
+            "start_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
+            "end_id": "4d4c8ab7-4047-4d3c-a00d-afec8d2d2ab4",
+            "start_port": "Ex Out",
+            "end_port": "Ex In"
+        },
+        {
+            "start_id": "99788e6a-af8c-4b31-bdc3-b7c275743bb2",
+            "end_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
             "start_port": "value",
             "end_port": "input A"
         },
         {
-            "start_id": "610ee41c-45ff-486e-a074-cc88b2e282f6",
+            "start_id": "fb254b28-ef69-4fc1-8619-ed4fd0581689",
             "end_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
-            "start_port": "output",
+            "start_port": "value",
             "end_port": "input B"
         },
         {
-            "start_id": "32fa39d4-d90b-46ea-bcec-bbb52f12e217",
-            "end_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
-            "start_port": "Ex Out",
-            "end_port": "Ex In"
-        },
-        {
             "start_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
-            "end_id": "7f781f85-a9dd-4d28-ba79-91bb69c9254a",
-            "start_port": "Ex Out",
-            "end_port": "Ex In"
-        },
-        {
-            "start_id": "0a3b1313-e73c-4f3a-b878-7a7a8a76518b",
-            "end_id": "7f781f85-a9dd-4d28-ba79-91bb69c9254a",
+            "end_id": "4d4c8ab7-4047-4d3c-a00d-afec8d2d2ab4",
             "start_port": "output",
-            "end_port": "input A"
+            "end_port": "input"
         }
     ]
 }
