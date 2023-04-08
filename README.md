@@ -12,7 +12,7 @@ For minimal GUI code for creating a node network see [GUI-nodes-only](https://gi
 
 Converting the original code base over to this more fully fledged out node editor, there will be loads of code smells. I’ll hold off on doing a refactor until the core components are fully functional. 
 
-![nodes](https://github.com/bhowiebkr/simple-node-editor/blob/master/images/node_editor.jpg)
+![nodes](https://github.com/bhowiebkr/simple-node-editor/blob/master/images/node_editor2.jpg)
 
 [![Video](http://img.youtube.com/vi/DOsFJ8lm9dU/0.jpg)](http://www.youtube.com/watch?v=DOsFJ8lm9dU)
 
