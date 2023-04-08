@@ -5,7 +5,7 @@ class Add_Node(Node):
     def __init__(self):
         super().__init__()
 
-        self.title = "Add"
+        self.title_text = "Add"
         self.type_text = "Logic Nodes"
         self.set_color(title_color=(0, 128, 0))
 

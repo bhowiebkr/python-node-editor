@@ -8,7 +8,7 @@ class Scaler_Node(Node):
     def __init__(self):
         super().__init__()
 
-        self.title = "Scaler"
+        self.title_text = "Scaler"
         self.type_text = "Constants"
         self.set_color(title_color=(255, 165, 0))
 

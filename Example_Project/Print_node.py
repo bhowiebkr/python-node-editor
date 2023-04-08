@@ -5,7 +5,7 @@ class Print_Node(Node):
     def __init__(self):
         super().__init__()
 
-        self.title = "Print"
+        self.title_text = "Print"
         self.type_text = "Debug Nodes"
         self.set_color(title_color=(160, 32, 240))
 

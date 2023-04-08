@@ -7,12 +7,11 @@ class Button_Node(Node):
     def __init__(self):
         super().__init__()
 
-        self.title = "Button"
+        self.title_text = "Button"
         self.type_text = "Inputs"
         self.set_color(title_color=(128, 0, 0))
 
         self.add_pin(name="Ex Out", is_output=True, execution=True)
-        # self.add_pin(name="value", is_output=True)
 
         self.build()
 
@@ -34,3 +33,4 @@ class Button_Node(Node):
 
     def btn_cmd(self):
         print("btn command")
+        self.execute()
