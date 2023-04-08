@@ -11,8 +11,8 @@ class Button_Node(Node):
         self.type_text = "Inputs"
         self.set_color(title_color=(128, 0, 0))
 
-        self.add_port(name="Ex Out", is_output=True, execution=True)
-        # self.add_port(name="value", is_output=True)
+        self.add_pin(name="Ex Out", is_output=True, execution=True)
+        # self.add_pin(name="value", is_output=True)
 
         self.build()
 

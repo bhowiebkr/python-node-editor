@@ -6,8 +6,8 @@ class Connection(QtWidgets.QGraphicsPathItem):
     A Connection represents a graphical connection between two NodePorts in a PySide6 application.
 
     Attributes:
-    start_port (NodePort): The NodePort where the connection starts.
-    end_port (NodePort): The NodePort where the connection ends.
+    start_pin (NodePort): The NodePort where the connection starts.
+    end_pin (NodePort): The NodePort where the connection ends.
     start_pos (QPointF): The starting position of the connection.
     end_pos (QPointF): The ending position of the connection.
 
@@ -20,8 +20,8 @@ class Connection(QtWidgets.QGraphicsPathItem):
 
     Example:
     conn = Connection(parent)
-    conn.start_port = start_port
-    conn.end_port = end_port
+    conn.start_pin = start_pin
+    conn.end_pin = end_pin
     conn.update_start_and_end_pos()
     conn.update_path()
     """
@@ -35,8 +35,8 @@ class Connection(QtWidgets.QGraphicsPathItem):
         self.setBrush(QtCore.Qt.NoBrush)
         self.setZValue(-1)
 
-        self._start_port = None
-        self._end_port = None
+        self._start_pin = None
+        self._end_pin = None
 
         self.start_pos = QtCore.QPointF()
         self.end_pos = QtCore.QPointF()
@@ -45,33 +45,33 @@ class Connection(QtWidgets.QGraphicsPathItem):
 
     def delete(self):
         """
-        Deletes the connection and removes it from the scene and any connected ports.
+        Deletes the connection and removes it from the scene and any connected pins.
         """
-        for port in (self._start_port, self._end_port):
-            if port:
-                # port.remove_connection(self)
-                port.connection = None
-            port = None
+        for pin in (self._start_pin, self._end_pin):
+            if pin:
+                # pin.remove_connection(self)
+                pin.connection = None
+            pin = None
 
         self.scene().removeItem(self)
 
     @property
-    def start_port(self):
-        return self._start_port
+    def start_pin(self):
+        return self._start_pin
 
     @property
-    def end_port(self):
-        return self._end_port
+    def end_pin(self):
+        return self._end_pin
 
-    @start_port.setter
-    def start_port(self, port):
-        self._start_port = port
-        self._start_port.connection = self
+    @start_pin.setter
+    def start_pin(self, pin):
+        self._start_pin = pin
+        self._start_pin.connection = self
 
-    @end_port.setter
-    def end_port(self, port):
-        self._end_port = port
-        self._end_port.connection = self
+    @end_pin.setter
+    def end_pin(self, pin):
+        self._end_pin = pin
+        self._end_pin.connection = self
 
     def nodes(self):
         """
@@ -80,33 +80,33 @@ class Connection(QtWidgets.QGraphicsPathItem):
         Returns:
         tuple: A tuple of the two Node objects connected by this Connection.
         """
-        return (self._start_port.node(), self._end_port.node())
+        return (self._start_pin.node(), self._end_pin.node())
 
     def update_start_and_end_pos(self):
         """
         Update the start and end positions of the Connection.
 
-        Get the start and end ports and use them to set the start and end positions.
+        Get the start and end pins and use them to set the start and end positions.
         """
 
-        if self.start_port and not self.start_port.is_output():
+        if self.start_pin and not self.start_pin.is_output():
             # print("flipping connection")
-            temp = self.end_port
-            self._end_port = self.start_port
-            self._start_port = temp
+            temp = self.end_pin
+            self._end_pin = self.start_pin
+            self._start_pin = temp
 
-        if self._start_port:
-            self.start_pos = self._start_port.scenePos()
+        if self._start_pin:
+            self.start_pos = self._start_pin.scenePos()
 
         # if we are pulling off an exiting connection we skip code below
-        if self._end_port:
-            self.end_pos = self._end_port.scenePos()
+        if self._end_pin:
+            self.end_pos = self._end_pin.scenePos()
 
         self.update_path()
 
     def update_path(self):
         """
-        Draws a smooth cubic curve from the start to end ports.
+        Draws a smooth cubic curve from the start to end pins.
         """
         path = QtGui.QPainterPath()
         path.moveTo(self.start_pos)
@@ -132,8 +132,8 @@ class Connection(QtWidgets.QGraphicsPathItem):
 
         thickness = 0
         color = QtGui.QColor(0, 128, 255)
-        if self._start_port:
-            if self._start_port.is_execution():
+        if self._start_pin:
+            if self._start_pin.is_execution():
                 thickness = 3
                 color = QtGui.QColor(255, 255, 255)
 

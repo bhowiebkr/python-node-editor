@@ -10,7 +10,7 @@ from node_editor.gui.view import View
 
 from node_editor.gui.connection import Connection
 from node_editor.gui.node import Node
-from node_editor.gui.port import Port
+from node_editor.gui.port import Pin
 
 
 class NodeScene(QtWidgets.QGraphicsScene):
@@ -94,11 +94,11 @@ class NodeWidget(QtWidgets.QWidget):
             connection = Connection(None)
             self.scene.addItem(connection)
 
-            start_port = self.node_lookup[c["start_id"]].get_port(c["start_port"])
-            end_port = self.node_lookup[c["end_id"]].get_port(c["end_port"])
+            start_pin = self.node_lookup[c["start_id"]].get_pin(c["start_pin"])
+            end_pin = self.node_lookup[c["end_id"]].get_pin(c["end_pin"])
 
-            connection.start_port = start_port
-            connection.end_port = end_port
+            connection.start_pin = start_pin
+            connection.end_pin = end_pin
             connection.update_start_and_end_pos()
 
     def save_project(self, json_path):
@@ -118,22 +118,22 @@ class NodeWidget(QtWidgets.QWidget):
                 nodes = item.nodes()
                 start_id = str(nodes[0].uuid)
                 end_id = str(nodes[1].uuid)
-                start_port = item.start_port.name()
-                end_port = item.end_port.name()
+                start_pin = item.start_pin.name()
+                end_pin = item.end_pin.name()
                 # print(f"Node ids {start_id, end_id}")
-                # print(f"connected ports {item.start_port.name(), item.end_port.name()}")
+                # print(f"connected ports {item.start_pin.name(), item.end_pin.name()}")
 
                 connection = {
                     "start_id": start_id,
                     "end_id": end_id,
-                    "start_port": start_port,
-                    "end_port": end_port,
+                    "start_pin": start_pin,
+                    "end_pin": end_pin,
                 }
                 scene["connections"].append(connection)
                 continue
 
-            # Ports
-            if isinstance(item, Port):
+            # Pins
+            if isinstance(item, Pin):
                 continue
 
             # Nodes

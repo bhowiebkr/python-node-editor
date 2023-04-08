@@ -4,7 +4,7 @@ from PySide6 import QtCore, QtWidgets
 
 from node_editor.gui.connection import Connection
 from node_editor.gui.node import Node
-from node_editor.gui.port import Port
+from node_editor.gui.port import Pin
 
 
 class NodeEditor(QtCore.QObject):
@@ -13,8 +13,8 @@ class NodeEditor(QtCore.QObject):
     nodes and connections.
         :ivar connection: A Connection object representing the current connection being created.
     :vartype connection: Connection
-    :ivar port: A Port object representing the current port being clicked for a new connection.
-    :vartype port: Port
+    :ivar port: A Pin object representing the current port being clicked for a new connection.
+    :vartype port: Pin
     :ivar scene: The QGraphicsScene on which the nodes and connections are drawn.
     :vartype scene: QGraphicsScene
     :ivar _last_selected: The last Node object that was selected.
@@ -77,7 +77,7 @@ class NodeEditor(QtCore.QObject):
             if event.button() == QtCore.Qt.LeftButton:
                 item = self.item_at(event.scenePos())
 
-                if isinstance(item, Port):
+                if isinstance(item, Pin):
                     self.connection = Connection(None)
                     self.scene.addItem(self.connection)
                     self.port = item
@@ -90,7 +90,7 @@ class NodeEditor(QtCore.QObject):
                     self.connection = Connection(None)
                     self.connection.start_pos = item.start_pos
                     self.scene.addItem(self.connection)
-                    self.port = item.start_port
+                    self.port = item.start_pin
                     self.connection.end_pos = event.scenePos()
                     self.connection.update_start_and_end_pos()  # to fix the offset
                     return True
@@ -129,7 +129,7 @@ class NodeEditor(QtCore.QObject):
                 item = self.item_at(event.scenePos())
 
                 # connecting a port
-                if isinstance(item, Port):
+                if isinstance(item, Pin):
                     if self.port.can_connect_to(item):
                         # print("Making connection")
 
@@ -141,8 +141,8 @@ class NodeEditor(QtCore.QObject):
                         self.port.clear_connection()
                         item.clear_connection()
 
-                        self.connection.start_port = self.port
-                        self.connection.end_port = item
+                        self.connection.start_pin = self.port
+                        self.connection.end_pin = item
                         self.connection.update_start_and_end_pos()
                     else:
                         # print("Deleting connection")

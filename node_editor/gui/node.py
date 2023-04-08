@@ -1,7 +1,7 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 
-from node_editor.gui.port import Port
+from node_editor.gui.port import Pin
 from enum import Enum
 
 
@@ -27,8 +27,8 @@ class Node(QtWidgets.QGraphicsItem):
         The width of the node.
     _height : int
         The height of the node.
-    _ports : list
-        A list of ports connected to this node.
+    _pins : list
+        A list of pins connected to this node.
     title_path : QtGui.QPainterPath
         The path for the title of the node.
     type_path : QtGui.QPainterPath
@@ -60,7 +60,7 @@ class Node(QtWidgets.QGraphicsItem):
 
         self._width = 20  # The Width of the node
         self._height = 20  # the height of the node
-        self._ports = []  # A list of ports
+        self._pins = []  # A list of pins
         self.uuid = None  # An identifier to used when saving and loading the scene
 
         self.node_color = QtGui.QColor(20, 20, 20, 200)
@@ -146,39 +146,39 @@ class Node(QtWidgets.QGraphicsItem):
             painter.setBrush(Qt.NoBrush)
             painter.drawPath(self.path)
 
-    def get_port(self, name):
-        for port in self._ports:
-            if port.name() == name:
-                return port
+    def get_pin(self, name):
+        for pin in self._pins:
+            if pin.name() == name:
+                return pin
 
-    def add_port(self, name, is_output=False, execution=False):
+    def add_pin(self, name, is_output=False, execution=False):
         """
-        Adds a new port to the node.
+        Adds a new pin to the node.
 
         Args:
-            name (str): The name of the new port.
-            is_output (bool, optional): True if the new port is an output port, False if it's an input port. Default is False.
-            flags (int, optional): A set of flags to apply to the new port. Default is 0.
-            ptr (Any, optional): A pointer to associate with the new port. Default is None.
+            name (str): The name of the new pin.
+            is_output (bool, optional): True if the new pin is an output pin, False if it's an input pin. Default is False.
+            flags (int, optional): A set of flags to apply to the new pin. Default is 0.
+            ptr (Any, optional): A pointer to associate with the new pin. Default is None.
 
         Returns:
             None: This method doesn't return anything.
 
         """
-        port = Port(self, self.scene())
-        port.set_is_output(is_output)
-        port.set_name(name)
-        port.set_node(node=self)
-        port.set_execution(execution)
+        pin = Pin(self, self.scene())
+        pin.set_is_output(is_output)
+        pin.set_name(name)
+        pin.set_node(node=self)
+        pin.set_execution(execution)
 
-        self._ports.append(port)
+        self._pins.append(pin)
 
     def build(self):
         """
         Builds the node by constructing its graphical representation.
 
         This method calculates the dimensions of the node, sets the fonts for various elements, and adds the necessary
-        graphical components to the node, such as the title, type, and ports. Once the graphical representation of the node
+        graphical components to the node, such as the title, type, and pins. Once the graphical representation of the node
         is constructed, the `setPath` method is called to set the path for the node.
 
         Returns:
@@ -198,7 +198,7 @@ class Node(QtWidgets.QGraphicsItem):
         # The fonts what will be used
         title_font = QtGui.QFont("Lucida Sans Unicode", pointSize=12)
         title_type_font = QtGui.QFont("Lucida Sans Unicode", pointSize=8)
-        port_font = QtGui.QFont("Lucida Sans Unicode")
+        pin_font = QtGui.QFont("Lucida Sans Unicode")
 
         # Get the dimentions of the title and type
         title_dim = {
@@ -220,20 +220,20 @@ class Node(QtWidgets.QGraphicsItem):
         # total_height = sum([title_dim["h"], title_type_dim["h"]]) + self.widget.size().height()
         total_height = bg_height + self.widget.size().height()
 
-        port_dim = None
-        # Add the heigth for each of the ports
+        pin_dim = None
+        # Add the heigth for each of the pins
         exec_height_added = False
-        for port in self._ports:
-            port_dim = {
-                "w": QtGui.QFontMetrics(port_font).horizontalAdvance(port.name()),
-                "h": QtGui.QFontMetrics(port_font).height(),
+        for pin in self._pins:
+            pin_dim = {
+                "w": QtGui.QFontMetrics(pin_font).horizontalAdvance(pin.name()),
+                "h": QtGui.QFontMetrics(pin_font).height(),
             }
 
-            if port_dim["w"] > total_width:
-                total_width = port_dim["w"]
+            if pin_dim["w"] > total_width:
+                total_width = pin_dim["w"]
 
-            if port.is_execution() and not exec_height_added or not port.is_execution():
-                total_height += port_dim["h"]
+            if pin.is_execution() and not exec_height_added or not pin.is_execution():
+                total_height += pin_dim["h"]
                 exec_height_added = True
 
         # Add the margin to the total_width
@@ -274,34 +274,34 @@ class Node(QtWidgets.QGraphicsItem):
             f"{self._type_text}",
         )
 
-        # Position the ports. Execution ports stay on the same row
-        if port_dim:
+        # Position the pins. Execution pins stay on the same row
+        if pin_dim:
             # y = (-total_height / 2) + title_dim["h"] + title_type_dim["h"] + 5
             y = bg_height - total_height / 2 - 10
 
-            # Do the execution ports
+            # Do the execution pins
             exe_shifted = False
-            for port in self._ports:
-                if not port.is_execution():
+            for pin in self._pins:
+                if not pin.is_execution():
                     continue
                 if not exe_shifted:
-                    y += port_dim["h"]
+                    y += pin_dim["h"]
                     exe_shifted = True
-                if port.is_output():
-                    port.setPos(total_width / 2 - 10, y)
+                if pin.is_output():
+                    pin.setPos(total_width / 2 - 10, y)
                 else:
-                    port.setPos(-total_width / 2 + 10, y)
+                    pin.setPos(-total_width / 2 + 10, y)
 
-            # Do the rest of the ports
-            for port in self._ports:
-                if port.is_execution():
+            # Do the rest of the pins
+            for pin in self._pins:
+                if pin.is_execution():
                     continue
-                y += port_dim["h"]
+                y += pin_dim["h"]
 
-                if port.is_output():
-                    port.setPos(total_width / 2 - 10, y)
+                if pin.is_output():
+                    pin.setPos(total_width / 2 - 10, y)
                 else:
-                    port.setPos(-total_width / 2 + 10, y)
+                    pin.setPos(-total_width / 2 + 10, y)
 
         self._width = total_width
         self._height = total_height
@@ -311,23 +311,23 @@ class Node(QtWidgets.QGraphicsItem):
 
     def select_connections(self, value):
         """
-        Sets the highlighting of all connected ports to the specified value.
+        Sets the highlighting of all connected pins to the specified value.
 
-        This method takes a boolean value `value` as input and sets the `_do_highlight` attribute of all connected ports to
-        this value. If a port is not connected, this method does nothing for that port. After setting the `_do_highlight`
-        attribute for all connected ports, the `update_path` method is called for each connection.
+        This method takes a boolean value `value` as input and sets the `_do_highlight` attribute of all connected pins to
+        this value. If a pin is not connected, this method does nothing for that pin. After setting the `_do_highlight`
+        attribute for all connected pins, the `update_path` method is called for each connection.
 
         Args:
-            value: A boolean value indicating whether to highlight the connected ports or not.
+            value: A boolean value indicating whether to highlight the connected pins or not.
 
         Returns:
             None.
         """
 
-        for port in self._ports:
-            if port.connection:
-                port.connection._do_highlight = value
-                port.connection.update_path()
+        for pin in self._pins:
+            if pin.connection:
+                pin.connection._do_highlight = value
+                pin.connection.update_path()
 
     def contextMenuEvent(self, event):
         """Open a context menu when the node is right-clicked.
@@ -364,7 +364,7 @@ class Node(QtWidgets.QGraphicsItem):
     def delete(self):
         """Deletes the connection.
 
-        This function removes any connected ports by calling :any:`Port.remove_connection` for each port
+        This function removes any connected pins by calling :any:`Port.remove_connection` for each pin
         connected to this connection. After all connections have been removed, the stored :any:`Port`
         references are set to None. Finally, :any:`QGraphicsScene.removeItem` is called on the scene to
         remove this widget.
@@ -373,7 +373,7 @@ class Node(QtWidgets.QGraphicsItem):
             None
         """
 
-        to_delete = [port.connection for port in self._ports if port.connection]
+        to_delete = [pin.connection for pin in self._pins if pin.connection]
         for connection in to_delete:
             connection.delete()
 
@@ -384,7 +384,7 @@ class Node(QtWidgets.QGraphicsItem):
         pass
 
     def execute(self):
-        # Get the values from the input ports
+        # Get the values from the input pins
         self.execute_inputs()
 
         # Compute the value

@@ -12,7 +12,7 @@ class Scaler_Node(Node):
         self.type_text = "Constants"
         self.set_color(title_color=(255, 165, 0))
 
-        self.add_port(name="value", is_output=True)
+        self.add_pin(name="value", is_output=True)
 
         self.build()
 

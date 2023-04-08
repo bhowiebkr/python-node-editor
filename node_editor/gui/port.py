@@ -1,33 +1,33 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 
 
-class Port(QtWidgets.QGraphicsPathItem):
-    """A graphics item representing an input or output port for a node in a node-based graphical user interface.
+class Pin(QtWidgets.QGraphicsPathItem):
+    """A graphics item representing an input or output pin for a node in a node-based graphical user interface.
 
     Attributes:
-        radius_ (int): The radius of the port circle.
-        margin (int): The margin between the port circle and the port name text.
-        port_text_height (int): The height of the port name text.
-        port_text_width (int): The width of the port name text.
-        _is_output (bool): True if the port is an output port, False if it is an input port.
-        _name (str): The name of the port.
-        m_node (Node): The node to which the port belongs.
-        connection (Connection): The connection attached to the port, if any.
-        text_path (QPainterPath): The path used to draw the port name text.
+        radius_ (int): The radius of the pin circle.
+        margin (int): The margin between the pin circle and the pin name text.
+        pin_text_height (int): The height of the pin name text.
+        pin_text_width (int): The width of the pin name text.
+        _is_output (bool): True if the pin is an output pin, False if it is an input pin.
+        _name (str): The name of the pin.
+        m_node (Node): The node to which the pin belongs.
+        connection (Connection): The connection attached to the pin, if any.
+        text_path (QPainterPath): The path used to draw the pin name text.
 
     Methods:
-        set_is_output(is_output: bool) -> None: Set the output status of the port.
-        set_name(name: str) -> None: Set the name of the port.
-        set_node(node: Node) -> None: Set the node to which the port belongs.
-        set_port_flags(flags: int) -> None: Set the port flags.
-        set_ptr(ptr: Any) -> None: Set the pointer to the port.
-        name() -> str: Get the name of the port.
-        is_output() -> bool: Check if the port is an output port.
-        node() -> Node: Get the node to which the port belongs.
-        paint(painter: QtGui.QPainter, option: QtWidgets.QStyleOptionGraphicsItem, widget: Optional[QtWidgets.QWidget]) -> None: Paint the port.
-        clear_connection() -> None: Clear the connection attached to the port.
-        can_connect_to(port: Port) -> bool: Check if the port can be connected to another port.
-        is_connected() -> bool: Check if the port is connected to another port.
+        set_is_output(is_output: bool) -> None: Set the output status of the pin.
+        set_name(name: str) -> None: Set the name of the pin.
+        set_node(node: Node) -> None: Set the node to which the pin belongs.
+        set_pin_flags(flags: int) -> None: Set the pin flags.
+        set_ptr(ptr: Any) -> None: Set the pointer to the pin.
+        name() -> str: Get the name of the pin.
+        is_output() -> bool: Check if the pin is an output pin.
+        node() -> Node: Get the node to which the pin belongs.
+        paint(painter: QtGui.QPainter, option: QtWidgets.QStyleOptionGraphicsItem, widget: Optional[QtWidgets.QWidget]) -> None: Paint the pin.
+        clear_connection() -> None: Clear the connection attached to the pin.
+        can_connect_to(pin: Pin) -> bool: Check if the pin can be connected to another pin.
+        is_connected() -> bool: Check if the pin is connected to another pin.
         itemChange(change: QtWidgets.QGraphicsItem.GraphicsItemChange, value: Any) -> Any: Handle item change events.
     """
 
@@ -59,7 +59,7 @@ class Port(QtWidgets.QGraphicsPathItem):
         self.font = QtGui.QFont()
         self.font_metrics = QtGui.QFontMetrics(self.font)
 
-        self.port_text_height = self.font_metrics.height()
+        self.pin_text_height = self.font_metrics.height()
 
         self._is_output = False
         self._name = None
@@ -95,14 +95,14 @@ class Port(QtWidgets.QGraphicsPathItem):
     def set_name(self, name):
         self._name = name
         nice_name = self._name.replace("_", " ").title()
-        self.port_text_width = self.font_metrics.horizontalAdvance(nice_name)
+        self.pin_text_width = self.font_metrics.horizontalAdvance(nice_name)
 
         if self._is_output:
-            x = -self.radius_ - self.margin - self.port_text_width
+            x = -self.radius_ - self.margin - self.pin_text_width
         else:
             x = self.radius_ + self.margin
 
-        y = self.port_text_height / 4
+        y = self.pin_text_height / 4
 
         self.text_path.addText(x, y, self.font, nice_name)
 
@@ -146,14 +146,14 @@ class Port(QtWidgets.QGraphicsPathItem):
         if self.connection:
             self.connection.delete()
 
-    def can_connect_to(self, port):
-        # print(port.node(), self.node())
-        if not port:
+    def can_connect_to(self, pin):
+        # print(pin.node(), self.node())
+        if not pin:
             return False
-        if port.node() == self.node():
+        if pin.node() == self.node():
             return False
 
-        return self._is_output != port._is_output
+        return self._is_output != pin._is_output
 
     def is_connected(self):
         return bool(self.connection)
