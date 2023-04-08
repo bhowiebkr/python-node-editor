@@ -50,8 +50,8 @@ class Node(QtWidgets.QGraphicsItem):
 
         self._type_text = "base"
 
-        self._width = 30  # The Width of the node
-        self._height = 30  # the height of the node
+        self._width = 20  # The Width of the node
+        self._height = 20  # the height of the node
         self._ports = []  # A list of ports
         self.uuid = None  # An identifier to used when saving and loading the scene
 
@@ -61,7 +61,7 @@ class Node(QtWidgets.QGraphicsItem):
         self.type_path = QtGui.QPainterPath()  # The path for the type
         self.misc_path = QtGui.QPainterPath()  # a bunch of other stuff
 
-        self.horizontal_margin = 30  # horizontal margin
+        self.horizontal_margin = 15  # horizontal margin
         self.vertical_margin = 15  # vertical margin
 
     def boundingRect(self):
@@ -163,12 +163,13 @@ class Node(QtWidgets.QGraphicsItem):
             None.
         """
 
-        self.init_widget() # configure the widget side of things. We need to get the size of the widget before building the rest of the node
+        self.init_widget()  # configure the widget side of things. We need to get the size of the widget before building the rest of the node
         self.widget.setStyleSheet("background-color: " + self.node_color.name() + ";")
         self.title_path = QtGui.QPainterPath()  # reset
         self.type_path = QtGui.QPainterPath()  # The path for the type
         self.misc_path = QtGui.QPainterPath()  # a bunch of other stuff
 
+        bg_height = 35  # background title height
 
         total_width = self.widget.size().width()
         self.path = QtGui.QPainterPath()  # The main path
@@ -194,10 +195,12 @@ class Node(QtWidgets.QGraphicsItem):
                 total_width = dim
 
         # Add both the title and type height together for the total height
-        total_height = sum([title_dim["h"], title_type_dim["h"]]) + self.widget.size().height()
+        # total_height = sum([title_dim["h"], title_type_dim["h"]]) + self.widget.size().height()
+        total_height = bg_height + self.widget.size().height()
 
         port_dim = None
         # Add the heigth for each of the ports
+        exec_height_added = False
         for port in self._ports:
             port_dim = {
                 "w": QtGui.QFontMetrics(port_font).horizontalAdvance(port.name()),
@@ -207,19 +210,20 @@ class Node(QtWidgets.QGraphicsItem):
             if port_dim["w"] > total_width:
                 total_width = port_dim["w"]
 
-            if not port.is_execution():
+            if port.is_execution() and not exec_height_added or not port.is_execution():
                 total_height += port_dim["h"]
+                exec_height_added = True
 
         # Add the margin to the total_width
         total_width += self.horizontal_margin
-        total_height += self.vertical_margin
+        # total_height += self.vertical_margin
 
         # Draw the background rectangle
         self.size = QtCore.QRectF(-total_width / 2, -total_height / 2, total_width, total_height)
-        self.path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, total_height + 15, 5, 5)
+        self.path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, total_height + 10, 5, 5)
 
         # The color on the title
-        bg_height = 35
+
         self.title_bg_path = QtGui.QPainterPath()  # The title background path
         self.title_bg_path.setFillRule(Qt.WindingFill)
         self.title_bg_path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, bg_height, 5, 5)
@@ -244,11 +248,27 @@ class Node(QtWidgets.QGraphicsItem):
 
         # Position the ports. Execution ports stay on the same row
         if port_dim:
-            y = (-total_height / 2) + title_dim["h"] + title_type_dim["h"] + 5
+            # y = (-total_height / 2) + title_dim["h"] + title_type_dim["h"] + 5
+            y = bg_height - total_height / 2 - 10
 
+            # Do the execution ports
+            exe_shifted = False
             for port in self._ports:
                 if not port.is_execution():
+                    continue
+                if not exe_shifted:
                     y += port_dim["h"]
+                    exe_shifted = True
+                if port.is_output():
+                    port.setPos(total_width / 2 - 10, y)
+                else:
+                    port.setPos(-total_width / 2 + 10, y)
+
+            # Do the rest of the ports
+            for port in self._ports:
+                if port.is_execution():
+                    continue
+                y += port_dim["h"]
 
                 if port.is_output():
                     port.setPos(total_width / 2 - 10, y)
@@ -259,7 +279,7 @@ class Node(QtWidgets.QGraphicsItem):
         self._height = total_height
 
         # move the widget to the bottom
-        self.widget.move(-self.widget.size().width()/2, total_height/2-self.widget.size().height() + 5)
+        self.widget.move(-self.widget.size().width() / 2, total_height / 2 - self.widget.size().height() + 5)
 
     def select_connections(self, value):
         """
@@ -333,8 +353,7 @@ class Node(QtWidgets.QGraphicsItem):
 
     # Override me
     def init_widget(self):
-        pass 
-        
+        pass
 
     def compute(self):
         # Get the values from the input ports
