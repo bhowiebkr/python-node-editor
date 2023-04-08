@@ -18,7 +18,9 @@ class Scaler_Node(Node):
 
     def init_widget(self):
         self.widget = QtWidgets.QWidget()
+        self.widget.setFixedWidth(100)
         layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
         self.scaler_line = FloatLineEdit()
         layout.addWidget(self.scaler_line)
         self.widget.setLayout(layout)
