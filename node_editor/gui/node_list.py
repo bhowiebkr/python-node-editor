@@ -13,6 +13,8 @@ class NodeList(QtWidgets.QListWidget):
         # make an item for each custom  class
 
         for name, data in imports.items():
+            name = name.replace("_Node", "")
+
             item = QtWidgets.QListWidgetItem(name)
             item.module = data["module"]
             item.class_name = data["class"]

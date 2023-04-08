@@ -1,4 +1,4 @@
-from node_editor.gui.node import Node
+from node_editor.node import Node
 
 
 class Add_Node(Node):

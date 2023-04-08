@@ -3,7 +3,7 @@ from contextlib import suppress
 from PySide6 import QtCore, QtWidgets
 
 from node_editor.gui.connection import Connection
-from node_editor.gui.node import Node
+from node_editor.node import Node
 from node_editor.gui.port import Pin
 
 

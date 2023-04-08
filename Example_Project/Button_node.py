@@ -1,6 +1,6 @@
 from PySide6 import QtWidgets
 
-from node_editor.gui.node import Node
+from node_editor.node import Node
 
 
 class Button_Node(Node):

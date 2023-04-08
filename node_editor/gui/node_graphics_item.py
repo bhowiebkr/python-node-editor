@@ -1,7 +1,7 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 
-from node_editor.gui.common import Node_Status
+from node_editor.common import Node_Status
 
 
 class Node_Graphics_Item(QtWidgets.QGraphicsItem):

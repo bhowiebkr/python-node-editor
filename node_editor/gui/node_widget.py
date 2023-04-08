@@ -4,12 +4,12 @@ from collections import OrderedDict
 
 from PySide6 import QtGui, QtWidgets
 
-from node_editor.gui.node import Node
+from node_editor.node import Node
 from node_editor.gui.node_editor import NodeEditor
 from node_editor.gui.view import View
 
 from node_editor.gui.connection import Connection
-from node_editor.gui.node import Node
+from node_editor.node import Node
 from node_editor.gui.port import Pin
 
 

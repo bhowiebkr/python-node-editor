@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt
 
 from node_editor.gui.port import Pin
 from node_editor.gui.node_graphics_item import Node_Graphics_Item
-from node_editor.gui.common import Node_Status
+from node_editor.common import Node_Status
 
 
 class Node(Node_Graphics_Item):
@@ -14,12 +14,15 @@ class Node(Node_Graphics_Item):
     def init_widget(self):
         pass
 
+    def compute(self):
+        raise NotImplementedError("compute is not implemented")
+
     def execute(self):
         # Get the values from the input pins
         self.execute_inputs()
 
         # Compute the value
-        pass
+        self.compute()
 
         # execute nodes connected to output
         self.execute_outputs()
