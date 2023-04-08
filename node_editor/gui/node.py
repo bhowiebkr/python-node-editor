@@ -64,8 +64,6 @@ class Node(QtWidgets.QGraphicsItem):
         self.horizontal_margin = 30  # horizontal margin
         self.vertical_margin = 15  # vertical margin
 
-        self.init_widget()
-
     def boundingRect(self):
         return self.size
 
@@ -165,11 +163,14 @@ class Node(QtWidgets.QGraphicsItem):
             None.
         """
 
+        self.init_widget() # configure the widget side of things. We need to get the size of the widget before building the rest of the node
+        self.widget.setStyleSheet("background-color: " + self.node_color.name() + ";")
         self.title_path = QtGui.QPainterPath()  # reset
         self.type_path = QtGui.QPainterPath()  # The path for the type
         self.misc_path = QtGui.QPainterPath()  # a bunch of other stuff
 
-        total_width = 0
+
+        total_width = self.widget.size().width()
         self.path = QtGui.QPainterPath()  # The main path
         # The fonts what will be used
         title_font = QtGui.QFont("Lucida Sans Unicode", pointSize=12)
@@ -193,7 +194,7 @@ class Node(QtWidgets.QGraphicsItem):
                 total_width = dim
 
         # Add both the title and type height together for the total height
-        total_height = sum([title_dim["h"], title_type_dim["h"]])
+        total_height = sum([title_dim["h"], title_type_dim["h"]]) + self.widget.size().height()
 
         port_dim = None
         # Add the heigth for each of the ports
@@ -215,7 +216,7 @@ class Node(QtWidgets.QGraphicsItem):
 
         # Draw the background rectangle
         self.size = QtCore.QRectF(-total_width / 2, -total_height / 2, total_width, total_height)
-        self.path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, total_height, 5, 5)
+        self.path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, total_height + 15, 5, 5)
 
         # The color on the title
         bg_height = 35
@@ -256,6 +257,9 @@ class Node(QtWidgets.QGraphicsItem):
 
         self._width = total_width
         self._height = total_height
+
+        # move the widget to the bottom
+        self.widget.move(-self.widget.size().width()/2, total_height/2-self.widget.size().height() + 5)
 
     def select_connections(self, value):
         """
@@ -327,8 +331,10 @@ class Node(QtWidgets.QGraphicsItem):
 
         self.scene().removeItem(self)
 
+    # Override me
     def init_widget(self):
-        print(self.widget.size())
+        pass 
+        
 
     def compute(self):
         # Get the values from the input ports
