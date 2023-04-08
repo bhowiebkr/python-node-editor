@@ -2,6 +2,13 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 
 from node_editor.gui.port import Port
+from enum import Enum
+
+
+class Node_Status(Enum):
+    CLEAN = 1
+    DIRTY = 2
+    ERROR = 3
 
 
 class Node(QtWidgets.QGraphicsItem):
@@ -44,6 +51,7 @@ class Node(QtWidgets.QGraphicsItem):
         self._title_text = "Title"
         self._title_color = QtGui.QColor(123, 33, 177)
         self.size = QtCore.QRectF()  # Size of
+        self.status = Node_Status.DIRTY
 
         self.widget = QtWidgets.QWidget()
         self.widget.resize(0, 0)
@@ -60,9 +68,18 @@ class Node(QtWidgets.QGraphicsItem):
         self.title_path = QtGui.QPainterPath()  # The path for the title
         self.type_path = QtGui.QPainterPath()  # The path for the type
         self.misc_path = QtGui.QPainterPath()  # a bunch of other stuff
+        self.status_path = QtGui.QPainterPath()  # A path showing the status of the node
 
         self.horizontal_margin = 15  # horizontal margin
         self.vertical_margin = 15  # vertical margin
+
+    def get_status_color(self):
+        if self.status == Node_Status.CLEAN:
+            return QtGui.QColor(0, 255, 0)
+        elif self.status == Node_Status.DIRTY:
+            return QtGui.QColor(255, 165, 0)
+        elif self.status == Node_Status.ERROR:
+            return QtGui.QColor(255, 0, 0)
 
     def boundingRect(self):
         return self.size
@@ -117,6 +134,11 @@ class Node(QtWidgets.QGraphicsItem):
         painter.drawPath(self.title_path)
         painter.drawPath(self.type_path)
         painter.drawPath(self.misc_path)
+
+        # Status path
+        painter.setBrush(self.get_status_color())
+        painter.setPen(self.get_status_color().darker())
+        painter.drawPath(self.status_path.simplified())
 
         # Draw the highlight
         if self.isSelected():
@@ -222,8 +244,14 @@ class Node(QtWidgets.QGraphicsItem):
         self.size = QtCore.QRectF(-total_width / 2, -total_height / 2, total_width, total_height)
         self.path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, total_height + 10, 5, 5)
 
-        # The color on the title
+        # Draw the status rectangle
+        self.status_path.setFillRule(Qt.WindingFill)
+        self.status_path.addRoundedRect(total_width / 2 - 12, -total_height / 2 + 2, 10, 10, 2, 2)
+        # self.status_path.addRect(total_width / 2 - 10, -total_height / 2, 5, 5)
+        # self.status_path.addRect(total_width / 2 - 10, -total_height / 2 + 15, 5, 5)
+        # self.status_path.addRect(total_width / 2 - 5, -total_height / 2 + 15, 5, 5)
 
+        # The color on the title
         self.title_bg_path = QtGui.QPainterPath()  # The title background path
         self.title_bg_path.setFillRule(Qt.WindingFill)
         self.title_bg_path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, bg_height, 5, 5)
@@ -355,11 +383,18 @@ class Node(QtWidgets.QGraphicsItem):
     def init_widget(self):
         pass
 
-    def compute(self):
+    def execute(self):
         # Get the values from the input ports
+        self.execute_inputs()
 
         # Compute the value
+        pass
 
-        # Signal output ports
+        # execute nodes connected to output
+        self.execute_outputs()
 
+    def execute_inputs(self):
+        pass
+
+    def execute_outputs(self):
         pass
