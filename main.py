@@ -101,14 +101,20 @@ class NodeEditor(QtWidgets.QMainWindow):
             self.imports = {}
 
             for file in project_path.glob("*.py"):
+
+                if not file.stem.endswith('_node'):
+                    print('file:', file.stem)
+                    continue
                 spec = importlib.util.spec_from_file_location(file.stem, file)
                 module = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(module)
 
                 for name, obj in inspect.getmembers(module):
+                    if not name.endswith('_Node'):
+                        continue
                     if inspect.isclass(obj):
                         self.imports[obj.__name__] = {"class": obj, "module": module}
-                        break
+                        #break
 
             self.node_list.update_project(self.imports)
 
