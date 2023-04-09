@@ -2,7 +2,7 @@ from contextlib import suppress
 
 from PySide6 import QtCore, QtWidgets
 
-from node_editor.gui.connection import Connection
+from node_editor.connection import Connection
 from node_editor.node import Node
 from node_editor.gui.port import Pin
 
@@ -141,8 +141,8 @@ class NodeEditor(QtCore.QObject):
                         self.port.clear_connection()
                         item.clear_connection()
 
-                        self.connection.start_pin = self.port
-                        self.connection.end_pin = item
+                        self.connection.set_start_pin(self.port)
+                        self.connection.set_end_pin(item)
                         self.connection.update_start_and_end_pos()
                     else:
                         # print("Deleting connection")

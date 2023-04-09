@@ -40,17 +40,7 @@ class Pin(QtWidgets.QGraphicsPathItem):
         self.execution = False
 
         path = QtGui.QPainterPath()
-        # if self.execution:
-        #     points = []
-        #     points.append(QtCore.QPointF(-6, -7))
-        #     points.append(QtCore.QPointF(-6, 7))
-        #     points.append(QtCore.QPointF(-2, 7))
-        #     points.append(QtCore.QPointF(6, 0))
-        #     points.append(QtCore.QPointF(-2, -7))
-        #     points.append(QtCore.QPointF(-6, -7))
 
-        #     path.addPolygon(QtGui.QPolygonF(points))
-        # else:
         path.addEllipse(-self.radius_, -self.radius_, 2 * self.radius_, 2 * self.radius_)
 
         self.setPath(path)

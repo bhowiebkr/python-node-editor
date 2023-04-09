@@ -8,7 +8,7 @@ from node_editor.node import Node
 from node_editor.gui.node_editor import NodeEditor
 from node_editor.gui.view import View
 
-from node_editor.gui.connection import Connection
+from node_editor.connection import Connection
 from node_editor.node import Node
 from node_editor.gui.port import Pin
 
@@ -97,8 +97,8 @@ class NodeWidget(QtWidgets.QWidget):
             start_pin = self.node_lookup[c["start_id"]].get_pin(c["start_pin"])
             end_pin = self.node_lookup[c["end_id"]].get_pin(c["end_pin"])
 
-            connection.start_pin = start_pin
-            connection.end_pin = end_pin
+            connection.set_start_pin(start_pin)
+            connection.set_end_pin(end_pin)
             connection.update_start_and_end_pos()
 
     def save_project(self, json_path):

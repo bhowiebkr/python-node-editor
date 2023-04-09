@@ -4,7 +4,7 @@ from PySide6.QtCore import Qt
 from node_editor.common import Node_Status
 
 
-class Node_Graphics_Item(QtWidgets.QGraphicsItem):
+class Node_Graphics(QtWidgets.QGraphicsItem):
     def __init__(self):
         super().__init__()
 
