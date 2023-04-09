@@ -1,7 +1,7 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 
-from node_editor.gui.port import Pin
+from node_editor.pin import Pin
 from node_editor.gui.node_graphics import Node_Graphics
 from node_editor.common import Node_Status
 
@@ -53,7 +53,7 @@ class Node(Node_Graphics):
 
     def get_pin(self, name):
         for pin in self._pins:
-            if pin.name() == name:
+            if pin.name == name:
                 return pin
 
     def add_pin(self, name, is_output=False, execution=False):
@@ -71,9 +71,9 @@ class Node(Node_Graphics):
 
         """
         pin = Pin(self, self.scene())
-        pin.set_is_output(is_output)
+        pin.is_output = is_output
         pin.set_name(name)
-        pin.set_node(node=self)
+        pin.node = self
         pin.set_execution(execution)
 
         self._pins.append(pin)

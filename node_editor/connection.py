@@ -43,7 +43,7 @@ class Connection(Connection_Graphics):
         Get the start and end pins and use them to set the start and end positions.
         """
 
-        if self.start_pin and not self.start_pin.is_output():
+        if self.start_pin and not self.start_pin.is_output:
             temp = self.end_pin
             self.end_pin = self.start_pin
             self.start_pin = temp

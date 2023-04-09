@@ -10,7 +10,7 @@ from node_editor.gui.view import View
 
 from node_editor.connection import Connection
 from node_editor.node import Node
-from node_editor.gui.port import Pin
+from node_editor.pin import Pin
 
 
 class NodeScene(QtWidgets.QGraphicsScene):
@@ -97,13 +97,16 @@ class NodeWidget(QtWidgets.QWidget):
             start_pin = self.node_lookup[c["start_id"]].get_pin(c["start_pin"])
             end_pin = self.node_lookup[c["end_id"]].get_pin(c["end_pin"])
 
-            connection.set_start_pin(start_pin)
-            connection.set_end_pin(end_pin)
+            print("start_pin", start_pin)
+
+            if start_pin:
+                connection.set_start_pin(start_pin)
+
+            if end_pin:
+                connection.set_end_pin(end_pin)
             connection.update_start_and_end_pos()
 
     def save_project(self, json_path):
-        # print(f"json path: {json_path}")
-
         from collections import OrderedDict
 
         # TODO possibly an ordered dict so things stay in order (better for git changes, and manual editing)

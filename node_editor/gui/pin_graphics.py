@@ -1,7 +1,7 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 
 
-class Pin(QtWidgets.QGraphicsPathItem):
+class Pin_Graphics(QtWidgets.QGraphicsPathItem):
     """A graphics item representing an input or output pin for a node in a node-based graphical user interface.
 
     Attributes:
@@ -51,21 +51,12 @@ class Pin(QtWidgets.QGraphicsPathItem):
 
         self.pin_text_height = self.font_metrics.height()
 
-        self._is_output = False
-        self._name = None
+        self.is_output = False
         self.margin = 2
-
-        self.m_node = None
-        self.connection = None
 
         self.text_path = QtGui.QPainterPath()
 
-    def is_execution(self):
-        return self.execution
-
     def set_execution(self, execution):
-        self.execution = execution
-
         if execution:
             path = QtGui.QPainterPath()
 
@@ -79,15 +70,11 @@ class Pin(QtWidgets.QGraphicsPathItem):
             path.addPolygon(QtGui.QPolygonF(points))
             self.setPath(path)
 
-    def set_is_output(self, is_output):
-        self._is_output = is_output
-
     def set_name(self, name):
-        self._name = name
-        nice_name = self._name.replace("_", " ").title()
+        nice_name = self.name.replace("_", " ").title()
         self.pin_text_width = self.font_metrics.horizontalAdvance(nice_name)
 
-        if self._is_output:
+        if self.is_output:
             x = -self.radius_ - self.margin - self.pin_text_width
         else:
             x = self.radius_ + self.margin
@@ -96,17 +83,17 @@ class Pin(QtWidgets.QGraphicsPathItem):
 
         self.text_path.addText(x, y, self.font, nice_name)
 
-    def set_node(self, node):
-        self.m_node = node
+    # def set_node(self, node):
+    #     self.m_node = node
 
-    def name(self):
-        return self._name
+    # def name(self):
+    #     return self._name
 
-    def is_output(self):
-        return self._is_output
+    # def is_output(self):
+    #     return self._is_output
 
-    def node(self):
-        return self.m_node
+    # def node(self):
+    #     return self.m_node
 
     def paint(self, painter, option=None, widget=None):
         if self.execution:
@@ -131,22 +118,6 @@ class Pin(QtWidgets.QGraphicsPathItem):
             painter.setPen(QtCore.Qt.NoPen)
             painter.setBrush(QtCore.Qt.white)
             painter.drawPath(self.text_path)
-
-    def clear_connection(self):
-        if self.connection:
-            self.connection.delete()
-
-    def can_connect_to(self, pin):
-        # print(pin.node(), self.node())
-        if not pin:
-            return False
-        if pin.node() == self.node():
-            return False
-
-        return self._is_output != pin._is_output
-
-    def is_connected(self):
-        return bool(self.connection)
 
     def itemChange(self, change, value):
         if change == QtWidgets.QGraphicsItem.ItemScenePositionHasChanged and self.connection:

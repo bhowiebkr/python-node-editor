@@ -145,14 +145,14 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         exec_height_added = False
         for pin in self._pins:
             pin_dim = {
-                "w": QtGui.QFontMetrics(pin_font).horizontalAdvance(pin.name()),
+                "w": QtGui.QFontMetrics(pin_font).horizontalAdvance(pin.name),
                 "h": QtGui.QFontMetrics(pin_font).height(),
             }
 
             if pin_dim["w"] > total_width:
                 total_width = pin_dim["w"]
 
-            if pin.is_execution() and not exec_height_added or not pin.is_execution():
+            if pin.execution and not exec_height_added or not pin.execution:
                 total_height += pin_dim["h"]
                 exec_height_added = True
 
@@ -202,23 +202,23 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
             # Do the execution pins
             exe_shifted = False
             for pin in self._pins:
-                if not pin.is_execution():
+                if not pin.execution:
                     continue
                 if not exe_shifted:
                     y += pin_dim["h"]
                     exe_shifted = True
-                if pin.is_output():
+                if pin.is_output:
                     pin.setPos(total_width / 2 - 10, y)
                 else:
                     pin.setPos(-total_width / 2 + 10, y)
 
             # Do the rest of the pins
             for pin in self._pins:
-                if pin.is_execution():
+                if pin.execution:
                     continue
                 y += pin_dim["h"]
 
-                if pin.is_output():
+                if pin.is_output:
                     pin.setPos(total_width / 2 - 10, y)
                 else:
                     pin.setPos(-total_width / 2 + 10, y)

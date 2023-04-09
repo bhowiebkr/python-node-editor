@@ -71,7 +71,7 @@ class Connection_Graphics(QtWidgets.QGraphicsPathItem):
         thickness = 0
         color = QtGui.QColor(0, 128, 255)
         if self.start_pin:
-            if self.start_pin.is_execution():
+            if self.start_pin.execution:
                 thickness = 3
                 color = QtGui.QColor(255, 255, 255)
 

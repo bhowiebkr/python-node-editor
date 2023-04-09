@@ -4,7 +4,7 @@ from PySide6 import QtCore, QtWidgets
 
 from node_editor.connection import Connection
 from node_editor.node import Node
-from node_editor.gui.port import Pin
+from node_editor.pin import Pin
 
 
 class NodeEditor(QtCore.QObject):
