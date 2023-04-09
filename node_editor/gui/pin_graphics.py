@@ -2,35 +2,6 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 
 class Pin_Graphics(QtWidgets.QGraphicsPathItem):
-    """A graphics item representing an input or output pin for a node in a node-based graphical user interface.
-
-    Attributes:
-        radius_ (int): The radius of the pin circle.
-        margin (int): The margin between the pin circle and the pin name text.
-        pin_text_height (int): The height of the pin name text.
-        pin_text_width (int): The width of the pin name text.
-        _is_output (bool): True if the pin is an output pin, False if it is an input pin.
-        _name (str): The name of the pin.
-        m_node (Node): The node to which the pin belongs.
-        connection (Connection): The connection attached to the pin, if any.
-        text_path (QPainterPath): The path used to draw the pin name text.
-
-    Methods:
-        set_is_output(is_output: bool) -> None: Set the output status of the pin.
-        set_name(name: str) -> None: Set the name of the pin.
-        set_node(node: Node) -> None: Set the node to which the pin belongs.
-        set_pin_flags(flags: int) -> None: Set the pin flags.
-        set_ptr(ptr: Any) -> None: Set the pointer to the pin.
-        name() -> str: Get the name of the pin.
-        is_output() -> bool: Check if the pin is an output pin.
-        node() -> Node: Get the node to which the pin belongs.
-        paint(painter: QtGui.QPainter, option: QtWidgets.QStyleOptionGraphicsItem, widget: Optional[QtWidgets.QWidget]) -> None: Paint the pin.
-        clear_connection() -> None: Clear the connection attached to the pin.
-        can_connect_to(pin: Pin) -> bool: Check if the pin can be connected to another pin.
-        is_connected() -> bool: Check if the pin is connected to another pin.
-        itemChange(change: QtWidgets.QGraphicsItem.GraphicsItemChange, value: Any) -> Any: Handle item change events.
-    """
-
     def __init__(self, parent, scene):
         super().__init__(parent)
 
@@ -82,18 +53,6 @@ class Pin_Graphics(QtWidgets.QGraphicsPathItem):
         y = self.pin_text_height / 4
 
         self.text_path.addText(x, y, self.font, nice_name)
-
-    # def set_node(self, node):
-    #     self.m_node = node
-
-    # def name(self):
-    #     return self._name
-
-    # def is_output(self):
-    #     return self._is_output
-
-    # def node(self):
-    #     return self.m_node
 
     def paint(self, painter, option=None, widget=None):
         if self.execution:
