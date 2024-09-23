@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from PySide6 import QtWidgets
 
-from node_editor.node import Node
 from Example_Project.common_widgets import FloatLineEdit
+from node_editor.node import Node
 
 
 class Scaler_Node(Node):

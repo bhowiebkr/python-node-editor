@@ -1,23 +1,31 @@
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt
+from __future__ import annotations
 
-from node_editor.pin import Pin
+from typing import List
+from typing import Optional
+
 from node_editor.gui.node_graphics import Node_Graphics
-from node_editor.common import Node_Status
+from node_editor.pin import Pin
+
+# from PySide6 import QtCore
+# from PySide6 import QtGui
+# from PySide6 import QtWidgets
+# from PySide6.QtCore import Qt
+# rom node_editor.common import Node_Status
 
 
 class Node(Node_Graphics):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
+        self._pins: List[Pin] = []
 
     # Override me
-    def init_widget(self):
+    def init_widget(self) -> None:
         pass
 
-    def compute(self):
+    def compute(self) -> None:
         raise NotImplementedError("compute is not implemented")
 
-    def execute(self):
+    def execute(self) -> None:
         # Get the values from the input pins
         self.execute_inputs()
 
@@ -27,13 +35,13 @@ class Node(Node_Graphics):
         # execute nodes connected to output
         self.execute_outputs()
 
-    def execute_inputs(self):
+    def execute_inputs(self) -> None:
         pass
 
-    def execute_outputs(self):
+    def execute_outputs(self) -> None:
         pass
 
-    def delete(self):
+    def delete(self) -> None:
         """Deletes the connection.
 
         This function removes any connected pins by calling :any:`Port.remove_connection` for each pin
@@ -51,18 +59,19 @@ class Node(Node_Graphics):
 
         self.scene().removeItem(self)
 
-    def get_pin(self, name):
+    def get_pin(self, name: str) -> Optional[Pin]:
         for pin in self._pins:
             if pin.name == name:
                 return pin
 
-    def add_pin(self, name, is_output=False, execution=False):
+    def add_pin(self, name: str, is_output: bool = False, execution: bool = False) -> None:
         """
         Adds a new pin to the node.
 
         Args:
             name (str): The name of the new pin.
-            is_output (bool, optional): True if the new pin is an output pin, False if it's an input pin. Default is False.
+            is_output (bool, optional): True if the new pin is an output pin, False if it's an input pin. Default is
+            False.
             flags (int, optional): A set of flags to apply to the new pin. Default is 0.
             ptr (Any, optional): A pointer to associate with the new pin. Default is None.
 
@@ -78,13 +87,14 @@ class Node(Node_Graphics):
 
         self._pins.append(pin)
 
-    def select_connections(self, value):
+    def select_connections(self, value: bool) -> None:
         """
         Sets the highlighting of all connected pins to the specified value.
 
-        This method takes a boolean value `value` as input and sets the `_do_highlight` attribute of all connected pins to
-        this value. If a pin is not connected, this method does nothing for that pin. After setting the `_do_highlight`
-        attribute for all connected pins, the `update_path` method is called for each connection.
+        This method takes a boolean value `value` as input and sets the `_do_highlight` attribute of all
+        connected pins to this value. If a pin is not connected, this method does nothing for that pin.
+        After setting the `_do_highlight` attribute for all connected pins, the `update_path` method is
+        called for each connection.
 
         Args:
             value: A boolean value indicating whether to highlight the connected pins or not.

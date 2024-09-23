@@ -9,13 +9,22 @@ This application uses PySide6 as a GUI toolkit.
 Author: Bryan Howard
 Repo: https://github.com/bhowiebkr/simple-node-editor
 """
+from __future__ import annotations
 
-import logging
-from pathlib import Path
 import importlib
 import inspect
+import logging
+import sys
+from pathlib import Path
+from typing import Any
+from typing import Dict
+from typing import Optional
 
-from PySide6 import QtCore, QtGui, QtWidgets
+import qdarktheme
+from PySide6 import QtCore
+from PySide6 import QtGui
+from PySide6 import QtWidgets
+from PySide6.QtCore import QByteArray  # Or from PySide2.QtCore import QByteArray
 
 from node_editor.gui.node_list import NodeList
 from node_editor.gui.node_widget import NodeWidget
@@ -23,14 +32,16 @@ from node_editor.gui.node_widget import NodeWidget
 logging.basicConfig(level=logging.DEBUG)
 
 
-class NodeEditor(QtWidgets.QMainWindow):
+class NodeEditor(QtWidgets.QMainWindow):  # type: ignore
     OnProjectPathUpdate = QtCore.Signal(Path)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: Optional[QtWidgets.QWidget] = None) -> None:
         super().__init__(parent)
-        self.settings = None
-        self.project_path = None
-        self.imports = None  # we will store the project import node types here for now.
+        self.settings: Optional[QtCore.QSettings] = None
+        self.project_path: Optional[Path] = None
+        self.imports: Optional[Dict[str, Dict[str, Any]]] = (
+            None  # we will store the project import node types here for now.
+        )
 
         icon = QtGui.QIcon("resources\\app.ico")
         self.setWindowIcon(icon)
@@ -59,10 +70,10 @@ class NodeEditor(QtWidgets.QMainWindow):
         left_layout.setContentsMargins(0, 0, 0, 0)
 
         # Widgets
-        self.node_list = NodeList(self)
+        self.node_list: NodeList = NodeList(self)
         left_widget = QtWidgets.QWidget()
-        self.splitter = QtWidgets.QSplitter()
-        self.node_widget = NodeWidget(self)
+        self.splitter: QtWidgets.QSplitter = QtWidgets.QSplitter()
+        self.node_widget: NodeWidget = NodeWidget(self)
 
         # Add Widgets to layouts
         self.splitter.addWidget(left_widget)
@@ -72,17 +83,17 @@ class NodeEditor(QtWidgets.QMainWindow):
         main_layout.addWidget(self.splitter)
 
         # Load the example project
-        example_project_path = (Path(__file__).parent.resolve() / 'Example_project')
+        example_project_path = Path(__file__).parent.resolve() / "Example_project"
         self.load_project(example_project_path)
 
         # Restore GUI from last state
         if settings.contains("geometry"):
-            self.restoreGeometry(settings.value("geometry"))
+            self.restoreGeometry(QByteArray(settings.value("geometry")))
 
             s = settings.value("splitterSize")
             self.splitter.restoreState(s)
 
-    def save_project(self):
+    def save_project(self) -> None:
         file_dialog = QtWidgets.QFileDialog()
         file_dialog.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
         file_dialog.setDefaultSuffix("json")
@@ -90,7 +101,7 @@ class NodeEditor(QtWidgets.QMainWindow):
         file_path, _ = file_dialog.getSaveFileName()
         self.node_widget.save_project(file_path)
 
-    def load_project(self, project_path=None):
+    def load_project(self, project_path: Optional[Path] = None) -> None:
         if not project_path:
             return
 
@@ -101,36 +112,35 @@ class NodeEditor(QtWidgets.QMainWindow):
             self.imports = {}
 
             for file in project_path.glob("*.py"):
-
-                if not file.stem.endswith('_node'):
-                    print('file:', file.stem)
+                if not file.stem.endswith("_node"):
+                    print("file:", file.stem)
                     continue
                 spec = importlib.util.spec_from_file_location(file.stem, file)
                 module = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(module)
 
                 for name, obj in inspect.getmembers(module):
-                    if not name.endswith('_Node'):
+                    if not name.endswith("_Node"):
                         continue
                     if inspect.isclass(obj):
                         self.imports[obj.__name__] = {"class": obj, "module": module}
-                        #break
+                        # break
 
             self.node_list.update_project(self.imports)
 
             # work on just the first json file. add the ablitity to work on multiple json files later
             for json_path in project_path.glob("*.json"):
-                self.node_widget.load_scene(json_path, self.imports)
+                self.node_widget.load_scene(str(json_path), self.imports)
                 break
 
-    def get_project_path(self):
+    def get_project_path(self) -> None:
         project_path = QtWidgets.QFileDialog.getExistingDirectory(None, "Select Project Folder", "")
         if not project_path:
             return
 
-        self.load_project(project_path)
+        self.load_project(Path(project_path))
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         """
         Handles the close event by saving the GUI state and closing the application.
 
@@ -151,9 +161,6 @@ class NodeEditor(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
-    import sys
-
-    import qdarktheme
 
     app = QtWidgets.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("resources\\app.ico"))

@@ -1,7 +1,16 @@
-from PySide6 import QtCore, QtGui, QtWidgets
+from __future__ import annotations
+
+from typing import Optional
+from typing import Tuple
+
+from PySide6 import QtCore
+from PySide6 import QtGui
+from PySide6 import QtWidgets
+
+from node_editor.node import Node
 
 
-class Connection_Graphics(QtWidgets.QGraphicsPathItem):
+class Connection_Graphics(QtWidgets.QGraphicsPathItem):  # type: ignore
     """
     A Connection represents a graphical connection between two NodePorts in a PySide6 application.
 
@@ -26,23 +35,23 @@ class Connection_Graphics(QtWidgets.QGraphicsPathItem):
     conn.update_path()
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent: Optional[QtWidgets.QGraphicsItem] = None) -> None:
         super().__init__(parent)
 
-        self.setFlag(QtWidgets.QGraphicsPathItem.ItemIsSelectable)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
 
         self.setPen(QtGui.QPen(QtGui.QColor(200, 200, 200), 2))
-        self.setBrush(QtCore.Qt.NoBrush)
+        self.setBrush(QtCore.Qt.BrushStyle.NoBrush)
         self.setZValue(-1)
 
-        self.start_pos = QtCore.QPointF()
-        self.end_pos = QtCore.QPointF()
-        self.start_pin = None
-        self.end_pin = None
+        self.start_pos: QtCore.QPointF = QtCore.QPointF()
+        self.end_pos: QtCore.QPointF = QtCore.QPointF()
+        self.start_pin: Optional[NodePort] = None
+        self.end_pin: Optional[NodePort] = None
 
-        self._do_highlight = False
+        self._do_highlight: bool = False
 
-    def update_path(self):
+    def update_path(self) -> None:
         """
         Draws a smooth cubic curve from the start to end pins.
         """
@@ -58,7 +67,12 @@ class Connection_Graphics(QtWidgets.QGraphicsPathItem):
 
         self.setPath(path)
 
-    def paint(self, painter, option=None, widget=None):
+    def paint(
+        self,
+        painter: QtGui.QPainter,
+        option: Optional[QtWidgets.QStyleOptionGraphicsItem] = None,
+        widget: Optional[QtWidgets.QWidget] = None,
+    ) -> None:
         """
         Override the default paint method depending on if the object is selected.
 
@@ -81,3 +95,15 @@ class Connection_Graphics(QtWidgets.QGraphicsPathItem):
             painter.setPen(QtGui.QPen(color, thickness))
 
         painter.drawPath(self.path())
+
+    def delete(self) -> None:
+        pass
+
+    def nodes(self) -> Tuple[Node, Node]:
+        # Implement the logic to return the connected nodes
+        if self.start_pin and self.end_pin:
+            return (self.start_pin.node, self.end_pin.node)
+        raise ValueError("Both start_pin and end_pin must be set")
+
+    def update_start_and_end_pos(self) -> None:
+        pass

@@ -1,4 +1,11 @@
-from PySide6 import QtCore, QtGui, QtOpenGLWidgets, QtWidgets
+from __future__ import annotations
+
+from typing import Optional
+
+from PySide6 import QtCore
+from PySide6 import QtGui
+from PySide6 import QtOpenGLWidgets
+from PySide6 import QtWidgets
 
 from node_editor.node import Node
 
@@ -8,34 +15,35 @@ class View(QtWidgets.QGraphicsView):
     View class for node editor.
     """
 
-    _background_color = QtGui.QColor(38, 38, 38)
+    _background_color: QtGui.QColor = QtGui.QColor(38, 38, 38)
 
-    _grid_pen_s = QtGui.QPen(QtGui.QColor(52, 52, 52, 255), 0.5)
-    _grid_pen_l = QtGui.QPen(QtGui.QColor(22, 22, 22, 255), 1.0)
+    _grid_pen_s: QtGui.QPen = QtGui.QPen(QtGui.QColor(52, 52, 52, 255), 0.5)
+    _grid_pen_l: QtGui.QPen = QtGui.QPen(QtGui.QColor(22, 22, 22, 255), 1.0)
 
-    _grid_size_fine = 15
-    _grid_size_course = 150
+    _grid_size_fine: int = 15
+    _grid_size_course: int = 150
 
-    _mouse_wheel_zoom_rate = 0.0015
+    _mouse_wheel_zoom_rate: float = 0.0015
 
     request_node = QtCore.Signal(object)
 
-    def __init__(self, parent):
+    def __init__(self, parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
         self.setRenderHint(QtGui.QPainter.Antialiasing)
-        self._manipulationMode = 0
+        self._manipulationMode: int = 0
 
-        gl_format = QtGui.QSurfaceFormat()
+        gl_format: QtGui.QSurfaceFormat = QtGui.QSurfaceFormat()
         gl_format.setSamples(10)
         QtGui.QSurfaceFormat.setDefaultFormat(gl_format)
-        gl_widget = QtOpenGLWidgets.QOpenGLWidget()
+        gl_widget: QtOpenGLWidgets.QOpenGLWidget = QtOpenGLWidgets.QOpenGLWidget()
 
-        self.currentScale = 1
-        self._pan = False
-        self._pan_start_x = 0
-        self._pan_start_y = 0
-        self._numScheduledScalings = 0
-        self.lastMousePos = QtCore.QPoint()
+        self.currentScale: float = 1
+        self._pan: bool = False
+        self._pan_start_x: int = 0
+        self._pan_start_y: int = 0
+        self._numScheduledScalings: int = 0
+        self.lastMousePos: QtCore.QPoint = QtCore.QPoint()
+        self.anim: Optional[QtCore.QTimeLine] = None
 
         self.setViewport(gl_widget)
 
@@ -45,7 +53,7 @@ class View(QtWidgets.QGraphicsView):
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
 
-    def wheelEvent(self, event):
+    def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
         """
         Handles the wheel events, e.g. zoom in/out.
 
@@ -70,7 +78,7 @@ class View(QtWidgets.QGraphicsView):
         self.anim.finished.connect(self.anim_finished)
         self.anim.start()
 
-    def scaling_time(self, x):
+    def scaling_time(self, x: float) -> None:
         """
         Updates the current scale based on the wheel events.
 
@@ -82,7 +90,7 @@ class View(QtWidgets.QGraphicsView):
 
         self.scale(factor, factor)
 
-    def anim_finished(self):
+    def anim_finished(self) -> None:
         """
         Called when the zoom animation is finished.
         """
@@ -91,7 +99,7 @@ class View(QtWidgets.QGraphicsView):
         else:
             self._numScheduledScalings += 1
 
-    def drawBackground(self, painter, rect):
+    def drawBackground(self, painter: QtGui.QPainter, rect: QtCore.QRectF) -> None:
         """
         Draws the background for the node editor view.
 
@@ -145,21 +153,21 @@ class View(QtWidgets.QGraphicsView):
 
         return super().drawBackground(painter, rect)
 
-    def contextMenuEvent(self, event):
+    def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
         """
-        This method is called when a context menu event is triggered in the view. It finds the item at the event position and
-        shows a context menu if the item is a Node.
+        This method is called when a context menu event is triggered in the view. It finds the item at the
+        event position and shows a context menu if the item is a Node.
         """
-        cursor = QtGui.QCursor()
+        # cursor = QtGui.QCursor()
         # origin = self.mapFromGlobal(cursor.pos())
-        pos = self.mapFromGlobal(cursor.pos())
+        # pos = self.mapFromGlobal(cursor.pos())
         item = self.itemAt(event.pos())
 
         if item:
             if isinstance(item, Node):
                 print("Found Node", item)
 
-                menu = QtWidgets.QMenu(self)
+                # menu = QtWidgets.QMenu(self)
 
                 # hello_action = QtWidgets.QAction("Hello", self)
 
@@ -169,28 +177,28 @@ class View(QtWidgets.QGraphicsView):
                 # if action == hello_action:
                 #    print("Hello")
 
-    def dragEnterEvent(self, e):
+    def dragEnterEvent(self, e: QtGui.QDragEnterEvent) -> None:
         """
-        This method is called when a drag and drop event enters the view. It checks if the mime data format is "text/plain"
-        and accepts or ignores the event accordingly.
+        This method is called when a drag and drop event enters the view. It checks if the mime data format
+        is "text/plain" and accepts or ignores the event accordingly.
         """
         if e.mimeData().hasFormat("text/plain"):
             e.accept()
         else:
             e.ignore()
 
-    def dropEvent(self, e):
+    def dropEvent(self, e: QtGui.QDropEvent) -> None:
         """
-        This method is called when a drag and drop event is dropped onto the view. It retrieves the name of the dropped node
-        from the mime data and emits a signal to request the creation of the corresponding node.
+        This method is called when a drag and drop event is dropped onto the view. It retrieves the name of the
+        dropped node from the mime data and emits a signal to request the creation of the corresponding node.
         """
         node = e.mimeData().item.class_name
         self.request_node.emit(node())
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """
-        This method is called when a mouse press event occurs in the view. It sets the cursor to a closed hand cursor and
-        enables panning if the middle mouse button is pressed.
+        This method is called when a mouse press event occurs in the view. It sets the cursor to a closed
+        hand cursor and enables panning if the middle mouse button is pressed.
         """
         if event.button() == QtCore.Qt.MiddleButton:
             self._pan = True
@@ -200,10 +208,10 @@ class View(QtWidgets.QGraphicsView):
 
         return super().mousePressEvent(event)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
         """
-        This method is called when a mouse release event occurs in the view. It sets the cursor back to the arrow cursor and
-        disables panning if the middle mouse button is released.
+        This method is called when a mouse release event occurs in the view. It sets the cursor back to the
+        arrow cursor and disables panning if the middle mouse button is released.
         """
         if event.button() == QtCore.Qt.MiddleButton:
             self._pan = False
@@ -211,7 +219,7 @@ class View(QtWidgets.QGraphicsView):
 
         return super().mouseReleaseEvent(event)
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         """
         This method is called when a mouse move event occurs in the view. It pans the view if the middle mouse button is
         pressed and moves the mouse.

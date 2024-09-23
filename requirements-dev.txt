@@ -1,0 +1,5 @@
+pre-commit
+coverage
+pytest
+pytest-qt
+types-requests

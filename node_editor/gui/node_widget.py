@@ -1,34 +1,34 @@
+from __future__ import annotations
+
 import json
 import uuid
-from collections import OrderedDict
+from typing import Dict
+from typing import Optional
 
-from PySide6 import QtGui, QtWidgets
-
-from node_editor.node import Node
-from node_editor.gui.node_editor import NodeEditor
-from node_editor.gui.view import View
+from PySide6 import QtGui
+from PySide6 import QtWidgets
 
 from node_editor.connection import Connection
+from node_editor.gui.node_editor import NodeEditor
+from node_editor.gui.view import View
 from node_editor.node import Node
 from node_editor.pin import Pin
 
 
-class NodeScene(QtWidgets.QGraphicsScene):
-    def dragEnterEvent(self, e):
+class NodeScene(QtWidgets.QGraphicsScene):  # type: ignore
+    def dragEnterEvent(self, e: QtGui.QDragEnterEvent) -> None:
         e.acceptProposedAction()
 
-    def dropEvent(self, e):
-        # find item at these coordinates
-        item = self.itemAt(e.scenePos())
-        if item.setAcceptDrops:
-            # pass on event to item at the coordinates
+    def dropEvent(self, e: QtGui.QDropEvent) -> None:
+        item = self.itemAt(e.scenePos(), QtGui.QTransform())
+        if item and hasattr(item, "setAcceptDrops"):
             item.dropEvent(e)
 
-    def dragMoveEvent(self, e):
+    def dragMoveEvent(self, e: QtGui.QDragMoveEvent) -> None:
         e.acceptProposedAction()
 
 
-class NodeWidget(QtWidgets.QWidget):
+class NodeWidget(QtWidgets.QWidget):  # type: ignore
     """
     Widget for creating and displaying a node editor.
 
@@ -38,7 +38,7 @@ class NodeWidget(QtWidgets.QWidget):
         view (View): The view object for the node editor.
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent: Optional[QtWidgets.QWidget] = None) -> None:
         """
         Initializes the NodeWidget object.
 
@@ -47,7 +47,9 @@ class NodeWidget(QtWidgets.QWidget):
         """
         super().__init__(parent)
 
-        self.node_lookup = {}  # A dictionary of nodes, by uuids for faster looking up. Refactor this in the future
+        self.node_lookup: Dict[uuid.UUID, Node] = (
+            {}
+        )  # A dictionary of nodes, by uuids for faster looking up. Refactor this in the future
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(main_layout)
@@ -63,13 +65,13 @@ class NodeWidget(QtWidgets.QWidget):
 
         self.view.request_node.connect(self.create_node)
 
-    def create_node(self, node):
+    def create_node(self, node: Node) -> None:
         node.uuid = uuid.uuid4()
         self.scene.addItem(node)
         pos = self.view.mapFromGlobal(QtGui.QCursor.pos())
         node.setPos(self.view.mapToScene(pos))
 
-    def load_scene(self, json_path, imports):
+    def load_scene(self, json_path: str, imports: Dict[str, Dict[str, Node]]) -> None:
         # load the scene json file
         data = None
         with open(json_path) as f:
@@ -106,12 +108,12 @@ class NodeWidget(QtWidgets.QWidget):
                 connection.set_end_pin(end_pin)
             connection.update_start_and_end_pos()
 
-    def save_project(self, json_path):
-        from collections import OrderedDict
+    def save_project(self, json_path: str) -> None:
+        # from collections import OrderedDict
 
         # TODO possibly an ordered dict so things stay in order (better for git changes, and manual editing)
         # Maybe connections will need a uuid for each so they can be sorted and kept in order.
-        scene = {"nodes": [], "connections": []}
+        scene: Dict[str, list] = {"nodes": [], "connections": []}
 
         # Need the nodes, and connections of ports to nodes
         for item in self.scene.items():

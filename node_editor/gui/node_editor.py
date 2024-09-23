@@ -1,13 +1,19 @@
-from contextlib import suppress
+from __future__ import annotations
 
-from PySide6 import QtCore, QtWidgets
+from contextlib import suppress
+from typing import Optional
+
+from PySide6 import QtCore
+from PySide6 import QtWidgets
+from PySide6.QtWidgets import QGraphicsItem
+from PySide6.QtWidgets import QGraphicsScene
 
 from node_editor.connection import Connection
 from node_editor.node import Node
 from node_editor.pin import Pin
 
 
-class NodeEditor(QtCore.QObject):
+class NodeEditor(QtWidgets.QWidget):
     """
     The main class of the node editor. This class handles the logic for creating, connecting, and deleting
     nodes and connections.
@@ -21,7 +27,7 @@ class NodeEditor(QtCore.QObject):
     :vartype _last_selected: Node
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent: Optional[QtWidgets.QWidget] = None) -> None:
         """
         Constructor for NodeEditor.
 
@@ -30,12 +36,14 @@ class NodeEditor(QtCore.QObject):
         """
 
         super().__init__(parent)
-        self.connection = None
-        self.port = None
-        self.scene = None
-        self._last_selected = None
+        self.setWindowTitle("Node Editor")
+        self.setGeometry(100, 100, 800, 600)
+        self.connection: Optional[Connection] = None
+        self.port: Optional[Pin] = None
+        self.scene: Optional[QGraphicsScene] = None
+        self._last_selected: Optional[Node] = None
 
-    def install(self, scene):
+    def install(self, scene: QGraphicsScene) -> None:
         """
         Installs the NodeEditor into a QGraphicsScene.
 
@@ -46,7 +54,7 @@ class NodeEditor(QtCore.QObject):
         self.scene = scene
         self.scene.installEventFilter(self)
 
-    def item_at(self, position):
+    def item_at(self, position: QtCore.QPointF) -> Optional[QGraphicsItem]:
         """
         Returns the QGraphicsItem at the given position.
 
@@ -56,10 +64,13 @@ class NodeEditor(QtCore.QObject):
         :rtype: QGraphicsItem
         """
 
+        if self.scene is None:
+            return None
+
         items = self.scene.items(QtCore.QRectF(position - QtCore.QPointF(1, 1), QtCore.QSizeF(3, 3)))
         return items[0] if items else None
 
-    def eventFilter(self, watched, event):
+    def eventFilter(self, watched: QtCore.QObject, event: QtCore.QEvent) -> bool:
         """
         Filters events from the QGraphicsScene.
 
@@ -70,7 +81,7 @@ class NodeEditor(QtCore.QObject):
         :return: True if the event was filtered, False otherwise.
         :rtype: bool
         """
-        if type(event) == QtWidgets.QWidgetItem:
+        if type(event) is QtWidgets.QWidgetItem:
             return False
 
         if event.type() == QtCore.QEvent.GraphicsSceneMousePress:

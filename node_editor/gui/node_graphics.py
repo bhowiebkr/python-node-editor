@@ -1,15 +1,22 @@
-from PySide6 import QtCore, QtGui, QtWidgets
+from __future__ import annotations
+
+from typing import List
+from typing import Optional
+
+from PySide6 import QtCore
+from PySide6 import QtGui
+from PySide6 import QtWidgets
 from PySide6.QtCore import Qt
 
 from node_editor.common import Node_Status
 
 
-class Node_Graphics(QtWidgets.QGraphicsItem):
-    def __init__(self):
+class Node_Graphics(QtWidgets.QGraphicsItem):  # type: ignore
+    def __init__(self) -> None:
         super().__init__()
 
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
 
         self.title_text = "Title"
         self.title_color = QtGui.QColor(123, 33, 177)
@@ -23,8 +30,8 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
 
         self._width = 20  # The Width of the node
         self._height = 20  # the height of the node
-        self._pins = []  # A list of pins
-        self.uuid = None  # An identifier to used when saving and loading the scene
+        self._pins: List[Pin] = []  # A list of pins
+        self.uuid: Optional[str] = None  # An identifier to used when saving and loading the scene
 
         self.node_color = QtGui.QColor(20, 20, 20, 200)
 
@@ -93,19 +100,19 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
             painter.setBrush(Qt.NoBrush)
             painter.drawPath(self.path)
 
-    def build(self):
+    def build(self) -> None:
         """
         Builds the node by constructing its graphical representation.
 
         This method calculates the dimensions of the node, sets the fonts for various elements, and adds the necessary
-        graphical components to the node, such as the title, type, and pins. Once the graphical representation of the node
-        is constructed, the `setPath` method is called to set the path for the node.
+        graphical components to the node, such as the title, type, and pins. Once the graphical representation of the
+        node is constructed, the `setPath` method is called to set the path for the node.
 
         Returns:
             None.
         """
-
-        self.init_widget()  # configure the widget side of things. We need to get the size of the widget before building the rest of the node
+        # configure the widget side of things. We need to get the size of the widget beforebuilding the rest of the node
+        # self.init_widget()
         self.widget.setStyleSheet("background-color: " + self.node_color.name() + ";")
         self.title_path = QtGui.QPainterPath()  # reset
         self.type_path = QtGui.QPainterPath()  # The path for the type
@@ -165,7 +172,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         self.path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, total_height + 10, 5, 5)
 
         # Draw the status rectangle
-        self.status_path.setFillRule(Qt.WindingFill)
+        self.status_path.setFillRule(Qt.FillRule.WindingFill)
         self.status_path.addRoundedRect(total_width / 2 - 12, -total_height / 2 + 2, 10, 10, 2, 2)
         # self.status_path.addRect(total_width / 2 - 10, -total_height / 2, 5, 5)
         # self.status_path.addRect(total_width / 2 - 10, -total_height / 2 + 15, 5, 5)
@@ -173,10 +180,12 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
 
         # The color on the title
         self.title_bg_path = QtGui.QPainterPath()  # The title background path
-        self.title_bg_path.setFillRule(Qt.WindingFill)
+        self.title_bg_path.setFillRule(Qt.FillRule.WindingFill)
         self.title_bg_path.addRoundedRect(-total_width / 2, -total_height / 2, total_width, bg_height, 5, 5)
         self.title_bg_path.addRect(-total_width / 2, -total_height / 2 + bg_height - 10, 10, 10)  # bottom left corner
-        self.title_bg_path.addRect(total_width / 2 - 10, -total_height / 2 + bg_height - 10, 10, 10)  # bottom right corner
+        self.title_bg_path.addRect(
+            total_width / 2 - 10, -total_height / 2 + bg_height - 10, 10, 10
+        )  # bottom right corner
 
         # Draw the title
         self.title_path.addText(
@@ -227,4 +236,4 @@ class Node_Graphics(QtWidgets.QGraphicsItem):
         self._height = total_height
 
         # move the widget to the bottom
-        self.widget.move(-self.widget.size().width() / 2, total_height / 2 - self.widget.size().height() + 5)
+        self.widget.move(int(-self.widget.size().width() / 2), int(total_height / 2 - self.widget.size().height() + 5))

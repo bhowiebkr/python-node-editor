@@ -6,7 +6,7 @@ The tool is designed to allow you to write Python code in individual files per c
 
 My goal with this project is to provide a new and innovative way of organizing and working with Python code. While the tool is still in the development phase, I am constantly working to improve its functionality and features.
 
-Visual scripting using nodes does have some benefits and drawbacks and it’s up to the end developer to decide when such a system is beneficial or not. 
+Visual scripting using nodes does have some benefits and drawbacks and it’s up to the end developer to decide when such a system is beneficial or not.
 
 ![nodes](https://github.com/bhowiebkr/simple-node-editor/blob/master/images/node_editor2.jpg)
 
@@ -16,7 +16,7 @@ Use it for:
 - enabling non-programmers a simple system to assemble blocks of logic
 - networks that require a high level of feedback throughout that network and not just the end result. Example shader building, sound synthesizing, machine learning, robotics and sensors. Each node can have a custom visual feedback such as images, graphs, sound timelines, spreadsheets etc.
 - prototyping logic.
-- Generator scripts. Taking an input or building up a result that gets saved for other uses. Example textures, images, sound, ML training data. 
+- Generator scripts. Taking an input or building up a result that gets saved for other uses. Example textures, images, sound, ML training data.
 
 Don’t use it for
 - Anything complex. 40 nodes or less. This is because the user not only needs to think of how nodes are logically connected, but also the visual composure of nodes in the graph. It’s always best to refactor code when a graph gets too complex to make sense of.
@@ -27,4 +27,3 @@ For minimal GUI code for creating a node network see [GUI-nodes-only](https://gi
 
 
 [![Video](http://img.youtube.com/vi/DOsFJ8lm9dU/0.jpg)](http://www.youtube.com/watch?v=DOsFJ8lm9dU)
-
