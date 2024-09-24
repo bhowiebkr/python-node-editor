@@ -1,14 +1,3 @@
-"""
-A simple Node Editor application that allows the user to create, modify and connect nodes of various types.
-
-The application consists of a main window that contains a splitter with a Node List and a Node Widget. The Node List
-shows a list of available node types, while the Node Widget is where the user can create, edit and connect nodes.
-
-This application uses PySide6 as a GUI toolkit.
-
-Author: Bryan Howard
-Repo: https://github.com/bhowiebkr/simple-node-editor
-"""
 from __future__ import annotations
 
 import importlib
@@ -30,6 +19,18 @@ from node_editor.gui.node_list import NodeList
 from node_editor.gui.node_widget import NodeWidget
 
 logging.basicConfig(level=logging.DEBUG)
+
+"""
+A simple Node Editor application that allows the user to create, modify and connect nodes of various types.
+
+The application consists of a main window that contains a splitter with a Node List and a Node Widget. The Node List
+shows a list of available node types, while the Node Widget is where the user can create, edit and connect nodes.
+
+This application uses PySide6 as a GUI toolkit.
+
+Author: Bryan Howard
+Repo: https://github.com/bhowiebkr/simple-node-editor
+"""
 
 
 class NodeEditor(QtWidgets.QMainWindow):  # type: ignore
@@ -115,8 +116,8 @@ class NodeEditor(QtWidgets.QMainWindow):  # type: ignore
                 if not file.stem.endswith("_node"):
                     print("file:", file.stem)
                     continue
-                spec = importlib.util.spec_from_file_location(file.stem, file)
-                module = importlib.util.module_from_spec(spec)
+                spec = importlib.util.spec_from_file_location(file.stem, file)  # type: ignore
+                module = importlib.util.module_from_spec(spec)  # type: ignore
                 spec.loader.exec_module(module)
 
                 for name, obj in inspect.getmembers(module):

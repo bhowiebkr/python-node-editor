@@ -63,8 +63,9 @@ class Node(Node_Graphics):
         for pin in self._pins:
             if pin.name == name:
                 return pin
+        return None
 
-    def add_pin(self, name: str, is_output: bool = False, execution: bool = False) -> None:
+    def add_pin(self, name: str, is_output: bool, execution: bool = False) -> None:
         """
         Adds a new pin to the node.
 

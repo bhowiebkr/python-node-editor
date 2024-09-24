@@ -10,7 +10,7 @@ class Pin(Pin_Graphics):
     def __init__(self, parent: Any, scene: Any) -> None:
         super().__init__(parent, scene)
 
-        self.name: Optional[str] = None
+        self.name: str = ""
         self.node: Optional[Any] = None
         self.connection: Optional[Any] = None
         self.execution: bool = False

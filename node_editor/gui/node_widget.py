@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 import uuid
+from typing import Any
 from typing import Dict
+from typing import List
 from typing import Optional
 
 from PySide6 import QtGui
@@ -113,7 +115,7 @@ class NodeWidget(QtWidgets.QWidget):  # type: ignore
 
         # TODO possibly an ordered dict so things stay in order (better for git changes, and manual editing)
         # Maybe connections will need a uuid for each so they can be sorted and kept in order.
-        scene: Dict[str, list] = {"nodes": [], "connections": []}
+        scene: Dict[str, List[Any]] = {"nodes": [], "connections": []}
 
         # Need the nodes, and connections of ports to nodes
         for item in self.scene.items():
@@ -121,10 +123,15 @@ class NodeWidget(QtWidgets.QWidget):  # type: ignore
             if isinstance(item, Connection):
                 # print(f"Name: {item}")
                 nodes = item.nodes()
-                start_id = str(nodes[0].uuid)
-                end_id = str(nodes[1].uuid)
-                start_pin = item.start_pin.name()
-                end_pin = item.end_pin.name()
+                print(f"length of nodes: {len(nodes)}")
+
+                if isinstance(nodes[0], Node):
+                    start_id = str(nodes[0].uuid)
+                if isinstance(nodes[1], Node):
+                    end_id = str(nodes[1].uuid)
+                if isinstance(item, Pin):
+                    start_pin = item.start_pin.name()
+                    end_pin = item.end_pin.name()
                 # print(f"Node ids {start_id, end_id}")
                 # print(f"connected ports {item.start_pin.name(), item.end_pin.name()}")
 

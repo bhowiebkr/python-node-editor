@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from PySide6 import QtWidgets
 
 from node_editor.node import Node
 
 
 class Button_Node(Node):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.title_text = "Button"
@@ -15,7 +17,7 @@ class Button_Node(Node):
 
         self.build()
 
-    def init_widget(self):
+    def init_widget(self) -> None:
         self.widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -31,6 +33,6 @@ class Button_Node(Node):
 
         super().init_widget()
 
-    def btn_cmd(self):
+    def btn_cmd(self) -> None:
         print("btn command")
         self.execute()

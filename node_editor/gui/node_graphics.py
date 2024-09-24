@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import uuid
 from typing import List
 from typing import Optional
+from typing import Tuple
 
 from PySide6 import QtCore
 from PySide6 import QtGui
@@ -9,6 +11,7 @@ from PySide6 import QtWidgets
 from PySide6.QtCore import Qt
 
 from node_editor.common import Node_Status
+from node_editor.pin import Pin
 
 
 class Node_Graphics(QtWidgets.QGraphicsItem):  # type: ignore
@@ -31,7 +34,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):  # type: ignore
         self._width = 20  # The Width of the node
         self._height = 20  # the height of the node
         self._pins: List[Pin] = []  # A list of pins
-        self.uuid: Optional[str] = None  # An identifier to used when saving and loading the scene
+        self.uuid: uuid.UUID  # An identifier to used when saving and loading the scene
 
         self.node_color = QtGui.QColor(20, 20, 20, 200)
 
@@ -43,7 +46,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):  # type: ignore
         self.horizontal_margin = 15  # horizontal margin
         self.vertical_margin = 15  # vertical margin
 
-    def get_status_color(self):
+    def get_status_color(self) -> QtGui.QColor:
         if self.status == Node_Status.CLEAN:
             return QtGui.QColor(0, 255, 0)
         elif self.status == Node_Status.DIRTY:
@@ -51,14 +54,26 @@ class Node_Graphics(QtWidgets.QGraphicsItem):  # type: ignore
         elif self.status == Node_Status.ERROR:
             return QtGui.QColor(255, 0, 0)
 
-    def boundingRect(self):
+    def boundingRect(self) -> QtCore.QRectF:
         return self.size
 
-    def set_color(self, title_color=(123, 33, 177), background_color=(20, 20, 20, 200)):
+    def set_color(
+        self, title_color: Tuple[int, int, int], background_color: Optional[Tuple[int, int, int]] = None
+    ) -> None:
+
+        # default title_color (123, 33, 177)
+
+        if background_color is None:
+            background_color = (20, 20, 20)
         self.title_color = QtGui.QColor(title_color[0], title_color[1], title_color[2])
         self.node_color = QtGui.QColor(background_color[0], background_color[1], background_color[2])
 
-    def paint(self, painter, option=None, widget=None):
+    def paint(
+        self,
+        painter: QtGui.QPainter,
+        option: QtWidgets.QStyleOptionGraphicsItem = None,
+        widget: QtWidgets.QWidget = None,
+    ) -> None:
         """
         Paints the node on the given painter.
 

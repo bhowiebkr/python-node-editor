@@ -7,7 +7,7 @@ from node_editor.node import Node
 
 
 class Scaler_Node(Node):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.title_text = "Scaler"
@@ -18,7 +18,7 @@ class Scaler_Node(Node):
 
         self.build()
 
-    def init_widget(self):
+    def init_widget(self) -> None:
         self.widget = QtWidgets.QWidget()
         self.widget.setFixedWidth(100)
         layout = QtWidgets.QVBoxLayout()

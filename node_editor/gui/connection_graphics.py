@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import cast
 from typing import Optional
 from typing import Tuple
 
@@ -8,6 +9,7 @@ from PySide6 import QtGui
 from PySide6 import QtWidgets
 
 from node_editor.node import Node
+from node_editor.pin import Pin
 
 
 class Connection_Graphics(QtWidgets.QGraphicsPathItem):  # type: ignore
@@ -46,8 +48,8 @@ class Connection_Graphics(QtWidgets.QGraphicsPathItem):  # type: ignore
 
         self.start_pos: QtCore.QPointF = QtCore.QPointF()
         self.end_pos: QtCore.QPointF = QtCore.QPointF()
-        self.start_pin: Optional[NodePort] = None
-        self.end_pin: Optional[NodePort] = None
+        self.start_pin: Optional[Pin]
+        self.end_pin: Optional[Pin]
 
         self._do_highlight: bool = False
 
@@ -99,10 +101,12 @@ class Connection_Graphics(QtWidgets.QGraphicsPathItem):  # type: ignore
     def delete(self) -> None:
         pass
 
-    def nodes(self) -> Tuple[Node, Node]:
+    def nodes(self) -> Tuple[Optional[Node], Optional[Node]]:
         # Implement the logic to return the connected nodes
         if self.start_pin and self.end_pin:
-            return (self.start_pin.node, self.end_pin.node)
+            start_node = cast(Optional[Node], self.start_pin.node) if self.start_pin else None
+            end_node = cast(Optional[Node], self.end_pin.node) if self.end_pin else None
+            return (start_node, end_node)
         raise ValueError("Both start_pin and end_pin must be set")
 
     def update_start_and_end_pos(self) -> None:

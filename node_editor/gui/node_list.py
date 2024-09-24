@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from types import ModuleType
 from typing import Dict
-from typing import List
 from typing import Optional
 from typing import Union
 
@@ -26,19 +25,18 @@ class ImportData:
         self.class_: str = class_
 
 
+# class NodeList(QtWidgets.QListWidget):  # type: ignore
+#    module: str
+#    class_: str
+
+
 class NodeList(QtWidgets.QListWidget):  # type: ignore
-    module: str
-    class_: str
-
-
-class NodeList(QtWidgets.QListWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent: Optional[QtWidgets.QWidget] = None) -> None:
         super().__init__(parent)
         self.setDragEnabled(True)  # enable dragging
 
     def update_project(self, imports: Dict[str, Dict[str, Union[type, ModuleType]]]) -> None:
 
-        print("imports:", imports, type(imports))
         # make an item for each custom class
         for name, data in imports.items():
             name = name.replace("_Node", "")

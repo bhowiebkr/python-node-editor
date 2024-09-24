@@ -10,7 +10,7 @@ from PySide6 import QtWidgets
 from node_editor.node import Node
 
 
-class View(QtWidgets.QGraphicsView):
+class View(QtWidgets.QGraphicsView):  # type: ignore
     """
     View class for node editor.
     """
@@ -151,7 +151,7 @@ class View(QtWidgets.QGraphicsView):
             y += self._grid_size_course
         painter.drawLines(gridLines)
 
-        return super().drawBackground(painter, rect)
+        super().drawBackground(painter, rect)
 
     def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
         """
@@ -206,7 +206,7 @@ class View(QtWidgets.QGraphicsView):
             self._pan_start_y = event.y()
             self.setCursor(QtCore.Qt.ClosedHandCursor)
 
-        return super().mousePressEvent(event)
+        super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
         """
@@ -217,7 +217,7 @@ class View(QtWidgets.QGraphicsView):
             self._pan = False
             self.setCursor(QtCore.Qt.ArrowCursor)
 
-        return super().mouseReleaseEvent(event)
+        super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         """
@@ -232,4 +232,4 @@ class View(QtWidgets.QGraphicsView):
             self._pan_start_x = event.x()
             self._pan_start_y = event.y()
 
-        return super().mouseMoveEvent(event)
+        super().mouseMoveEvent(event)

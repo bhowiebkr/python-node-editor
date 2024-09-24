@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Optional
 from typing import Tuple
 
 from node_editor.node import Node
@@ -18,9 +19,12 @@ class Print_Node(Node):
         self.add_pin(name="input", is_output=False)
         self.build()
 
-    def set_color(self, title_color: Tuple[int, int, int]) -> None:
-        # Assuming set_color is defined in the parent class
-        super().set_color(title_color=title_color)
+    def set_color(
+        self,
+        title_color: Tuple[int, int, int],
+        background_color: Optional[Tuple[int, int, int]] = None,
+    ) -> None:
+        super().set_color(title_color, background_color)
 
     def add_pin(self, name: str, is_output: bool, execution: bool = False) -> None:
         # Assuming add_pin is defined in the parent class

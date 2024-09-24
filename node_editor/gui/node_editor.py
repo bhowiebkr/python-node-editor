@@ -13,7 +13,7 @@ from node_editor.node import Node
 from node_editor.pin import Pin
 
 
-class NodeEditor(QtWidgets.QWidget):
+class NodeEditor(QtWidgets.QWidget):  # type: ignore
     """
     The main class of the node editor. This class handles the logic for creating, connecting, and deleting
     nodes and connections.
@@ -40,7 +40,7 @@ class NodeEditor(QtWidgets.QWidget):
         self.setGeometry(100, 100, 800, 600)
         self.connection: Optional[Connection] = None
         self.port: Optional[Pin] = None
-        self.scene: Optional[QGraphicsScene] = None
+        self.scene: QGraphicsScene
         self._last_selected: Optional[Node] = None
 
     def install(self, scene: QGraphicsScene) -> None:
@@ -140,7 +140,7 @@ class NodeEditor(QtWidgets.QWidget):
                 item = self.item_at(event.scenePos())
 
                 # connecting a port
-                if isinstance(item, Pin):
+                if isinstance(item, Pin) and self.port:
                     if self.port.can_connect_to(item):
                         # print("Making connection")
 
@@ -167,4 +167,4 @@ class NodeEditor(QtWidgets.QWidget):
                 self.port = None
                 return True
 
-        return super().eventFilter(watched, event)
+        return bool(super().eventFilter(watched, event))
