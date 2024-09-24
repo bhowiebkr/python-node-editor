@@ -127,7 +127,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):  # type: ignore
             None.
         """
         # configure the widget side of things. We need to get the size of the widget beforebuilding the rest of the node
-        # self.init_widget()
+        self.init_widget()
         self.widget.setStyleSheet("background-color: " + self.node_color.name() + ";")
         self.title_path = QtGui.QPainterPath()  # reset
         self.type_path = QtGui.QPainterPath()  # The path for the type
