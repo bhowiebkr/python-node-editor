@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import random
 from typing import Any
 from typing import Dict
 from typing import List
@@ -67,8 +66,8 @@ class NodeWidget(QtWidgets.QWidget):  # type: ignore
 
         self.view.request_node.connect(self.create_node)
 
-    def create_node(self, node: Node) -> None:
-        node.index = random.randint(1, 99999)
+    def create_node(self, node: Node, index: int) -> None:
+        node.index = index
         self.scene.addItem(node)
         pos = self.view.mapFromGlobal(QtGui.QCursor.pos())
         node.setPos(self.view.mapToScene(pos))
