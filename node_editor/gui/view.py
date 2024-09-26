@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+from typing import List
 from typing import Optional
 
 from PySide6 import QtCore
@@ -158,24 +160,11 @@ class View(QtWidgets.QGraphicsView):  # type: ignore
         This method is called when a context menu event is triggered in the view. It finds the item at the
         event position and shows a context menu if the item is a Node.
         """
-        # cursor = QtGui.QCursor()
-        # origin = self.mapFromGlobal(cursor.pos())
-        # pos = self.mapFromGlobal(cursor.pos())
         item = self.itemAt(event.pos())
 
         if item:
             if isinstance(item, Node):
                 print("Found Node", item)
-
-                # menu = QtWidgets.QMenu(self)
-
-                # hello_action = QtWidgets.QAction("Hello", self)
-
-                # menu.addAction(hello_action)
-                # action = menu.exec_(self.mapToGlobal(pos))
-
-                # if action == hello_action:
-                #    print("Hello")
 
     def dragEnterEvent(self, e: QtGui.QDragEnterEvent) -> None:
         """
@@ -233,3 +222,11 @@ class View(QtWidgets.QGraphicsView):  # type: ignore
             self._pan_start_y = event.y()
 
         super().mouseMoveEvent(event)
+
+    def get_items_by_type(self, item_class: type) -> List[Any]:
+        items = []
+        for item in self.scene().items():
+            print(f"current item: {item}, class: {item_class}")
+            if isinstance(item, item_class):
+                items.append(item)
+        return items
