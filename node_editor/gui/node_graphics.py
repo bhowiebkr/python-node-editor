@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import uuid
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -34,7 +33,7 @@ class Node_Graphics(QtWidgets.QGraphicsItem):  # type: ignore
         self._width = 20  # The Width of the node
         self._height = 20  # the height of the node
         self._pins: List[Pin] = []  # A list of pins
-        self.uuid: uuid.UUID  # An identifier to used when saving and loading the scene
+        self.index: int  # An identifier to used when saving and loading the scene
 
         self.node_color = QtGui.QColor(20, 20, 20, 200)
 
@@ -158,6 +157,9 @@ class Node_Graphics(QtWidgets.QGraphicsItem):  # type: ignore
             if dim > total_width:
                 total_width = dim
 
+        # Add the width for the pins
+        total_width += self.horizontal_margin  # Increased width for spacing
+
         # Add both the title and type height together for the total height
         # total_height = sum([title_dim["h"], title_type_dim["h"]]) + self.widget.size().height()
         total_height = bg_height + self.widget.size().height()
@@ -217,6 +219,9 @@ class Node_Graphics(QtWidgets.QGraphicsItem):  # type: ignore
             title_type_font,
             f"{self.type_text}",
         )
+
+        # Position the widget in the center
+        self.widget.move(int(-self.widget.size().width() / 2), int(-self.widget.size().height() / 2))
 
         # Position the pins. Execution pins stay on the same row
         if pin_dim:

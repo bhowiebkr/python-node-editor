@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import uuid
+import random
 from typing import Any
 from typing import Dict
 from typing import List
@@ -49,7 +49,7 @@ class NodeWidget(QtWidgets.QWidget):  # type: ignore
         """
         super().__init__(parent)
 
-        self.node_lookup: Dict[uuid.UUID, Node] = (
+        self.node_lookup: Dict[int, Node] = (
             {}
         )  # A dictionary of nodes, by uuids for faster looking up. Refactor this in the future
         main_layout = QtWidgets.QVBoxLayout()
@@ -68,7 +68,7 @@ class NodeWidget(QtWidgets.QWidget):  # type: ignore
         self.view.request_node.connect(self.create_node)
 
     def create_node(self, node: Node) -> None:
-        node.uuid = uuid.uuid4()
+        node.index = random.randint(1, 99999)
         self.scene.addItem(node)
         pos = self.view.mapFromGlobal(QtGui.QCursor.pos())
         node.setPos(self.view.mapToScene(pos))
@@ -85,23 +85,27 @@ class NodeWidget(QtWidgets.QWidget):  # type: ignore
         # Add the nodes
         if data:
             for node in data["nodes"]:
-                info = imports[node["type"]]
+                try:
+                    info = imports[node["type"]]
+                except KeyError:
+                    continue
                 node_item = info["class"]()
-                node_item.uuid = node["uuid"]
+                node_item.index = node["index"]
                 self.scene.addItem(node_item)
                 node_item.setPos(node["x"], node["y"])
 
-                self.node_lookup[node["uuid"]] = node_item
+                self.node_lookup[node["index"]] = node_item
 
         # Add the connections
         for c in data["connections"]:
             connection = Connection(None)
             self.scene.addItem(connection)
 
-            start_pin = self.node_lookup[c["start_id"]].get_pin(c["start_pin"])
-            end_pin = self.node_lookup[c["end_id"]].get_pin(c["end_pin"])
-
-            print("start_pin", start_pin)
+            try:
+                start_pin = self.node_lookup[c["start_id"]].get_pin(c["start_pin"])
+                end_pin = self.node_lookup[c["end_id"]].get_pin(c["end_pin"])
+            except KeyError:  # Node might be missing so we skip it
+                continue
 
             if start_pin:
                 connection.set_start_pin(start_pin)
@@ -114,7 +118,7 @@ class NodeWidget(QtWidgets.QWidget):  # type: ignore
         # from collections import OrderedDict
 
         # TODO possibly an ordered dict so things stay in order (better for git changes, and manual editing)
-        # Maybe connections will need a uuid for each so they can be sorted and kept in order.
+        # Maybe connections will need an index for each so they can be sorted and kept in order.
         scene: Dict[str, List[Any]] = {"nodes": [], "connections": []}
 
         # Need the nodes, and connections of ports to nodes
@@ -123,15 +127,13 @@ class NodeWidget(QtWidgets.QWidget):  # type: ignore
             if isinstance(item, Connection):
                 # print(f"Name: {item}")
                 nodes = item.nodes()
-                print(f"length of nodes: {len(nodes)}")
-
-                if isinstance(nodes[0], Node):
-                    start_id = str(nodes[0].uuid)
-                if isinstance(nodes[1], Node):
-                    end_id = str(nodes[1].uuid)
-                if isinstance(item, Pin):
-                    start_pin = item.start_pin.name()
-                    end_pin = item.end_pin.name()
+                if nodes[0]:
+                    start_id = str(nodes[0].index)
+                else:
+                    continue
+                end_id = str(nodes[1].index)  # type: ignore
+                start_pin = item.start_pin.name  # type: ignore
+                end_pin = item.end_pin.name  # type: ignore
                 # print(f"Node ids {start_id, end_id}")
                 # print(f"connected ports {item.start_pin.name(), item.end_pin.name()}")
 
@@ -158,9 +160,9 @@ class NodeWidget(QtWidgets.QWidget):  # type: ignore
                 obj_type = type(item).__name__
                 # print(f"node type: {obj_type}")
 
-                node_id = str(item.uuid)
+                node_id = str(item.index)
 
-                node = {"type": obj_type, "x": x, "y": y, "uuid": node_id}
+                node = {"type": obj_type, "x": x, "y": y, "index": node_id}
                 scene["nodes"].append(node)
 
         # Write the items_info dictionary to a JSON file
