@@ -15,8 +15,11 @@ from PySide6 import QtGui
 from PySide6 import QtWidgets
 from PySide6.QtCore import QByteArray  # Or from PySide2.QtCore import QByteArray
 
+from node_editor.compute_graph import compute_dag_nodes
+from node_editor.connection import Connection
 from node_editor.gui.node_list import NodeList
 from node_editor.gui.node_widget import NodeWidget
+from node_editor.node import Node
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -74,6 +77,9 @@ class NodeEditor(QtWidgets.QMainWindow):  # type: ignore
         self.node_list: NodeList = NodeList(self)
         left_widget = QtWidgets.QWidget()
         self.splitter: QtWidgets.QSplitter = QtWidgets.QSplitter()
+        execute_button = QtWidgets.QPushButton("Execute Graph")
+        execute_button.setFixedHeight(40)
+        execute_button.clicked.connect(self.execute_graph)
         self.node_widget: NodeWidget = NodeWidget(self)
 
         # Add Widgets to layouts
@@ -81,6 +87,7 @@ class NodeEditor(QtWidgets.QMainWindow):  # type: ignore
         self.splitter.addWidget(self.node_widget)
         left_widget.setLayout(left_layout)
         left_layout.addWidget(self.node_list)
+        left_layout.addWidget(execute_button)
         main_layout.addWidget(self.splitter)
 
         # Load the example project
@@ -93,6 +100,17 @@ class NodeEditor(QtWidgets.QMainWindow):  # type: ignore
 
             s = settings.value("splitterSize")
             self.splitter.restoreState(s)
+
+    def execute_graph(self) -> None:
+        print("Executing Graph:")
+
+        # Get a list of the nodes in the view
+        nodes = self.node_widget.view.get_items_by_type(Node)
+        edges = self.node_widget.view.get_items_by_type(Connection)
+        print(nodes)
+        compute_dag_nodes(nodes, edges)
+
+        # sort them
 
     def save_project(self) -> None:
         file_dialog = QtWidgets.QFileDialog()
@@ -151,9 +169,6 @@ class NodeEditor(QtWidgets.QMainWindow):  # type: ignore
         Returns:
             None.
         """
-
-        # debugging lets save the scene:
-        # self.node_widget.save_project("C:/Users/Howard/simple-node-editor/Example_Project/test.json")
 
         self.settings = QtCore.QSettings("node-editor", "NodeEditor")
         self.settings.setValue("geometry", self.saveGeometry())
