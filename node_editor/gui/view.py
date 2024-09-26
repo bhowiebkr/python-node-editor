@@ -27,7 +27,7 @@ class View(QtWidgets.QGraphicsView):  # type: ignore
 
     _mouse_wheel_zoom_rate: float = 0.0015
 
-    request_node = QtCore.Signal(object)
+    request_node = QtCore.Signal(object, int)
 
     def __init__(self, parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
@@ -182,7 +182,8 @@ class View(QtWidgets.QGraphicsView):  # type: ignore
         dropped node from the mime data and emits a signal to request the creation of the corresponding node.
         """
         node = e.mimeData().item.class_name
-        self.request_node.emit(node())
+        next_index = self.get_total_nodes()
+        self.request_node.emit(node(), next_index)
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """
@@ -230,3 +231,6 @@ class View(QtWidgets.QGraphicsView):  # type: ignore
             if isinstance(item, item_class):
                 items.append(item)
         return items
+
+    def get_total_nodes(self) -> int:
+        return len(self.get_items_by_type(Node))
