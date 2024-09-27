@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-from typing import List
 from typing import Optional
 
 from PySide6 import QtCore
@@ -182,7 +180,7 @@ class View(QtWidgets.QGraphicsView):  # type: ignore
         dropped node from the mime data and emits a signal to request the creation of the corresponding node.
         """
         node = e.mimeData().item.class_name
-        next_index = self.get_total_nodes()
+        next_index = self.scene().get_total_nodes()
         self.request_node.emit(node(), next_index)
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
@@ -223,14 +221,3 @@ class View(QtWidgets.QGraphicsView):  # type: ignore
             self._pan_start_y = event.y()
 
         super().mouseMoveEvent(event)
-
-    def get_items_by_type(self, item_class: type) -> List[Any]:
-        items = []
-        for item in self.scene().items():
-            print(f"current item: {item}, class: {item_class}")
-            if isinstance(item, item_class):
-                items.append(item)
-        return items
-
-    def get_total_nodes(self) -> int:
-        return len(self.get_items_by_type(Node))

@@ -28,6 +28,36 @@ class NodeScene(QtWidgets.QGraphicsScene):  # type: ignore
     def dragMoveEvent(self, e: QtGui.QDragMoveEvent) -> None:
         e.acceptProposedAction()
 
+    def get_items_by_type(self, item_class: type) -> List[Any]:
+        items = []
+        for item in self.items():
+            print(f"current item: {item}, class: {item_class}")
+            if isinstance(item, item_class):
+                items.append(item)
+        return items
+
+    def get_total_nodes(self) -> int:
+        return len(self.get_items_by_type(Node))
+
+    # TODO Scene should delete the node
+    # TODO Scene should reorder Node indexes after Node delete
+
+    def delete_node_and_reorder(self, node_to_delete: Node) -> None:
+        # Delete the node
+        node_to_delete.delete()
+
+        # Make a mapping of the new indexes for the nodes
+        nodes = self.get_items_by_type(Node)
+        new_index_mapping = {node.index: new_index for new_index, node in enumerate(nodes)}
+
+        # Reindex the nodes
+        for node in nodes:
+            node.index = new_index_mapping[str(node.index)]
+
+    def delete_connection(self, connection_to_delete: Connection) -> None:
+        # We an safly delete a connection without having to do anything extra
+        connection_to_delete.delete()
+
 
 class NodeWidget(QtWidgets.QWidget):  # type: ignore
     """

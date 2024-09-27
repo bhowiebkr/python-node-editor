@@ -105,12 +105,10 @@ class NodeEditor(QtWidgets.QMainWindow):  # type: ignore
         print("Executing Graph:")
 
         # Get a list of the nodes in the view
-        nodes = self.node_widget.view.get_items_by_type(Node)
-        edges = self.node_widget.view.get_items_by_type(Connection)
-        print(nodes)
-        compute_dag_nodes(nodes, edges)
-
+        nodes = self.node_widget.scene.get_items_by_type(Node)
+        edges = self.node_widget.scene.get_items_by_type(Connection)
         # sort them
+        compute_dag_nodes(nodes, edges)
 
     def save_project(self) -> None:
         file_dialog = QtWidgets.QFileDialog()

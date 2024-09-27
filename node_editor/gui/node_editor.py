@@ -98,6 +98,7 @@ class NodeEditor(QtWidgets.QWidget):  # type: ignore
                     return True
 
                 if isinstance(item, Connection):
+                    print("selected a Connection")
                     self.connection = Connection(None)
                     self.connection.start_pos = item.start_pos
                     self.scene.addItem(self.connection)
@@ -124,8 +125,10 @@ class NodeEditor(QtWidgets.QWidget):  # type: ignore
         elif event.type() == QtCore.QEvent.KeyPress:
             if event.key() == QtCore.Qt.Key_Delete:
                 for item in self.scene.selectedItems():
-                    if isinstance(item, (Connection, Node)):
-                        item.delete()
+                    if isinstance(item, Connection):
+                        self.scene.delete_connection(item)
+                    elif isinstance(item, Node):
+                        self.scene.delete_node_and_reorder(item)
 
                 return True
 
