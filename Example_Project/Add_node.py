@@ -36,3 +36,18 @@ class Add_Node(Node):
     def build(self) -> None:
         # Assuming build is defined in the parent class
         super().build()
+
+    def compute(self) -> None:
+        a_pin = self.get_pin("input A")
+        b_pin = self.get_pin("input B")
+        out_pin = self.get_pin("output")
+
+        a = a_pin.value if a_pin and hasattr(a_pin, "value") else 0
+        b = b_pin.value if b_pin and hasattr(b_pin, "value") else 0
+
+        print(f"a: {a}, b: {b}")
+
+        result = a + b
+
+        if out_pin:
+            out_pin.value = result

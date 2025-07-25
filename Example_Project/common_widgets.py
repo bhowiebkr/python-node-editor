@@ -19,6 +19,12 @@ class FloatLineEdit(QtWidgets.QLineEdit):  # type: ignore
         else:
             super().keyPressEvent(event)
 
+    def value(self) -> float:
+        try:
+            return float(self.text())
+        except ValueError:
+            return 0.0
+
 
 class FloatValidator(QtGui.QDoubleValidator):  # type: ignore
     def __init__(self, parent: Optional[QtGui.QObject] = None) -> None:

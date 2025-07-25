@@ -33,3 +33,8 @@ class Print_Node(Node):
     def build(self) -> None:
         # Assuming build is defined in the parent class
         super().build()
+
+    def compute(self) -> None:
+        pin = self.get_pin("input")
+        value = pin.value if pin and hasattr(pin, "value") else None
+        print(f"[Print Node] Value: {value}")

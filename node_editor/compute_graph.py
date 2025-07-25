@@ -45,22 +45,33 @@ def topologicalSort(adj: List[List[int]], num_nodes: int) -> List[int]:
 
 
 def compute_dag_nodes(nodes: List[Node], connections: List[Connection]) -> None:
-    print("Compute DAG Nodes")
+    print("=== Computing DAG Nodes ===")
 
     num_nodes = len(nodes)
-    # Get the edges
+
+    # Build adjacency list from connection pairs
     edges = []
     for connection in connections:
-        edges.append([int(node.index) for node in connection.nodes() if node is not None])
+        node_pair = [int(node.index) for node in connection.nodes() if node is not None]
+        if len(node_pair) == 2:
+            edges.append(node_pair)
 
-    # Adjacency List
     adjacency: List[List[int]] = [[] for _ in range(num_nodes)]
+    for src, dst in edges:
+        adjacency[src].append(dst)
 
-    for edge in edges:
-        adjacency[edge[0]].append(edge[1])
-
-    print("adjacency:\n\n", adjacency)
+    print("Adjacency List:")
+    for idx, adj in enumerate(adjacency):
+        print(f"{idx}: {adj}")
 
     topological_order = topologicalSort(adjacency, num_nodes)
 
-    print(topological_order)
+    print("\nTopological Order:", topological_order)
+
+    for node_index in topological_order:
+        node = nodes[node_index]
+        try:
+            print(f"\n--- Executing Node {node_index} ({node.__class__.__name__}) ---")
+            node.execute()
+        except Exception as e:
+            print(f"Error executing node {node_index}: {e}")

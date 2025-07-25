@@ -32,3 +32,10 @@ class Scaler_Node(Node):
         proxy.setParentItem(self)
 
         super().init_widget()
+
+    def compute(self) -> None:
+        value = self.scaler_line.value()
+        print(f"value: {value}")
+        pin = self.get_pin("value")
+        if pin:
+            pin.value = value

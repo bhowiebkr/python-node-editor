@@ -36,7 +36,14 @@ class Node(Node_Graphics):
         self.execute_outputs()
 
     def execute_inputs(self) -> None:
-        pass
+        """Pull values from connected output pins into this node's input pins."""
+        for pin in self._pins:
+            if pin.is_output:
+                continue
+            if pin.connection:
+                other_pin = pin.connection.get_other_pin(pin)
+                if other_pin and hasattr(other_pin, "value"):
+                    pin.value = other_pin.value
 
     def execute_outputs(self) -> None:
         pass

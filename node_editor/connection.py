@@ -60,3 +60,11 @@ class Connection(Connection_Graphics):
 
     def update_path(self) -> None:
         super().update_path()
+
+    def get_other_pin(self, this_pin: Pin) -> Optional[Pin]:
+        if this_pin == self.start_pin:
+            return self.end_pin
+        elif this_pin == self.end_pin:
+            return self.start_pin
+        else:
+            return None
