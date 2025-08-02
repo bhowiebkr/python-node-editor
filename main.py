@@ -60,7 +60,7 @@ class NodeEditor(QtWidgets.QMainWindow):  # type: ignore
         self.restore_gui_state()
 
         # Load example project
-        example_project_path = Path(__file__).parent.resolve() / "Example_project"
+        example_project_path = Path(__file__).parent.resolve() / "Example_Project"
         self.load_project(example_project_path)
 
     def restore_gui_state(self) -> None:
