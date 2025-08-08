@@ -1,4 +1,5 @@
 # Python Node Editor
+You might be interested in this newer version which embeds code inside nodes: https://github.com/bhowiebkr/PyFlowCanvas/
 
 This is a node based Python tool used for visual scripting that is designed to be used for composing high level Python code into reusable blocks. Nodes look and function similar to Unreal Engine blueprints. Each node consists of connection pins and a widget section enabling the developer to write a full custom PySide GUI for each node type.
 
