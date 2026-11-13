@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QSplitter,
     QToolBar,
     QToolButton,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -49,7 +50,7 @@ class MainWindow(QMainWindow):
         self.node_list = NodeList(self.node_classes)
 
         self.splitter = QSplitter()
-        self.splitter.addWidget(self.node_list)
+        self.splitter.addWidget(self._make_left_panel())
         self.splitter.addWidget(self.view)
         self.splitter.setStretchFactor(1, 1)
         self.splitter.setSizes([200, 1000])
@@ -62,6 +63,22 @@ class MainWindow(QMainWindow):
             self.open_file(start_file)
         else:
             self._update_title()
+
+    def _make_left_panel(self) -> QWidget:
+        title = QLabel("Nodes")
+        title.setObjectName("PanelTitle")
+        hint = QLabel("Drag a node into the view.")
+        hint.setObjectName("PanelHint")
+
+        panel = QWidget()
+        panel.setObjectName("LeftPanel")
+        layout = QVBoxLayout(panel)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(title)
+        layout.addWidget(hint)
+        layout.addWidget(self.node_list)
+        return panel
 
     def _make_toolbar(self) -> None:
         """Make one row at the top: the File menu, the Run Graph button and the messages."""

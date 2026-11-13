@@ -59,6 +59,37 @@ QMenu {
     color: #a0a0a0;
     padding-right: 8px;
 }
+#LeftPanel {
+    background: #1f1f1f;
+}
+#PanelTitle {
+    font-size: 11pt;
+    font-weight: bold;
+    padding: 12px 12px 0 12px;
+}
+#PanelHint {
+    color: #8c8c8c;
+    padding: 2px 12px 8px 12px;
+}
+#NodeList {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0 6px;
+}
+#NodeList::item {
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+#NodeList::item:selected {
+    background: #2a82da;
+}
+QSplitter::handle {
+    background: #141414;
+}
+QSplitter::handle:horizontal {
+    width: 3px;
+}
 """
 
 
