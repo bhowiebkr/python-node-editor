@@ -133,7 +133,7 @@ These rules apply to connections:
 | Exec output | One. A new connection replaces the old one. |
 | Exec input | Many. Many nodes can start the same node. |
 
-The graph refuses a connection that makes a loop. A loop has no first node, so the graph cannot run it.
+The graph refuses a connection that makes a cycle: a path of connections that comes back to the same node. A cycle has no first node, so the graph cannot run it. To run nodes many times, use the For Loop node.
 
 ### What happens when you click Run Graph
 

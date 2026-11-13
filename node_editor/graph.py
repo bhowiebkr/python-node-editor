@@ -89,7 +89,8 @@ class Graph:
         start, end = (a, b) if a.is_output else (b, a)
         if any(c.start is start and c.end is end for c in self.connections):
             return False  # The pins already have this connection.
-        # The connection must not make a loop. A loop has no first node, so the graph cannot run it.
+        # The connection must not make a cycle (a path back to the same node). A cycle has no first
+        # node, so the graph cannot run it. To run nodes many times, use a loop node (see For Loop).
         return not self.reaches(end.node, start.node)
 
     def connect(self, a: Pin, b: Pin) -> Connection | None:

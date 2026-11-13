@@ -58,7 +58,7 @@ def test_connect_refuses_the_same_connection_two_times() -> None:
     assert len(graph.connections) == 1
 
 
-def test_connect_refuses_a_loop() -> None:
+def test_connect_refuses_a_cycle() -> None:
     graph = Graph()
     first = graph.add_node(SumNode())
     second = graph.add_node(SumNode())
