@@ -4,9 +4,9 @@
 
 A small node editor in Python and PySide6, made to be easy to read and learn from.
 
-The full editor is about 1,500 lines of Python, with comments. Read the code to learn how a node editor works: nodes, pins, connections, run order, save and open.
+The full editor is about 1,700 lines of Python, with comments. Read the code to learn how a node editor works: nodes, pins, connections, run order, loops, save and open. The example project has more than 40 nodes and 7 example graphs.
 
-![The Python Node Editor with the example graph](images/screenshot.png)
+![The Python Node Editor with the shopping list graph](images/screenshot.png)
 
 > For a larger editor that keeps the Python code inside the nodes, see [PyFlowCanvas](https://github.com/bhowiebkr/PyFlowCanvas/).
 
