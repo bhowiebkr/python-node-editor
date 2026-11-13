@@ -69,20 +69,28 @@ def test_open_skips_bad_connections(caplog: pytest.LogCaptureFixture) -> None:
     assert "Bad connection" in caplog.text
 
 
-def test_example_graph_opens_and_runs(capsys: pytest.CaptureFixture[str]) -> None:
+def run_example(file_name: str, capsys: pytest.CaptureFixture[str]) -> list[str]:
+    """Open an example graph, run it, and return the lines that it printed."""
     graph = Graph()
-    graph.load(EXAMPLE_FOLDER / "example.json", load_node_classes(EXAMPLE_FOLDER))
-    assert len(graph.nodes) == 5
-    assert len(graph.connections) == 4
-
+    graph.load(EXAMPLE_FOLDER / file_name, load_node_classes(EXAMPLE_FOLDER))
     run_graph(graph)
+    return capsys.readouterr().out.splitlines()
 
-    assert "Print: 5.0" in capsys.readouterr().out
+
+@pytest.mark.parametrize(
+    ("file_name", "expected"),
+    [
+        ("example.json", ["Print: 5.0"]),
+    ],
+)
+def test_example_graph_opens_and_runs(file_name: str, expected: list[str], capsys: pytest.CaptureFixture[str]) -> None:
+    assert run_example(file_name, capsys) == expected
 
 
-def test_example_file_is_the_same_as_a_saved_file(tmp_path: Path) -> None:
+@pytest.mark.parametrize("path", sorted(EXAMPLE_FOLDER.glob("*.json")), ids=lambda path: path.name)
+def test_example_file_is_the_same_as_a_saved_file(path: Path, tmp_path: Path) -> None:
     graph = Graph()
-    graph.load(EXAMPLE_FOLDER / "example.json", load_node_classes(EXAMPLE_FOLDER))
+    graph.load(path, load_node_classes(EXAMPLE_FOLDER))
     graph.save(tmp_path / "copy.json")
     saved = json.loads((tmp_path / "copy.json").read_text(encoding="utf-8"))
-    assert saved == json.loads((EXAMPLE_FOLDER / "example.json").read_text(encoding="utf-8"))
+    assert saved == json.loads(path.read_text(encoding="utf-8"))
