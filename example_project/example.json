@@ -1,0 +1,69 @@
+{
+    "nodes": [
+        {
+            "id": 1,
+            "type": "ButtonNode",
+            "x": -380,
+            "y": -180,
+            "state": {}
+        },
+        {
+            "id": 2,
+            "type": "ScalarNode",
+            "x": -380,
+            "y": -40,
+            "state": {
+                "value": 2.0
+            }
+        },
+        {
+            "id": 3,
+            "type": "ScalarNode",
+            "x": -380,
+            "y": 80,
+            "state": {
+                "value": 3.0
+            }
+        },
+        {
+            "id": 4,
+            "type": "AddNode",
+            "x": -130,
+            "y": 0,
+            "state": {}
+        },
+        {
+            "id": 5,
+            "type": "PrintNode",
+            "x": 120,
+            "y": -120,
+            "state": {}
+        }
+    ],
+    "connections": [
+        {
+            "from_node": 1,
+            "from_pin": "clicked",
+            "to_node": 5,
+            "to_pin": "exec"
+        },
+        {
+            "from_node": 2,
+            "from_pin": "value",
+            "to_node": 4,
+            "to_pin": "a"
+        },
+        {
+            "from_node": 3,
+            "from_pin": "value",
+            "to_node": 4,
+            "to_pin": "b"
+        },
+        {
+            "from_node": 4,
+            "from_pin": "result",
+            "to_node": 5,
+            "to_pin": "value"
+        }
+    ]
+}
