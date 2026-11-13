@@ -6,11 +6,12 @@ from typing import Any
 
 import pytest
 
-from node_editor.execution import run_node
+from node_editor.execution import run_from, run_node
 from node_editor.graph import Graph
 from node_editor.loader import load_node_classes
 from node_editor.node import Node, Status
 from tests.conftest import EXAMPLE_FOLDER
+from tests.helpers import LogNode, NumberNode, StartNode
 
 NODE_CLASSES = load_node_classes(EXAMPLE_FOLDER)
 
@@ -180,3 +181,80 @@ def test_list_node_gives_the_result(class_name: str, inputs: dict[str, Any], exp
 
 def test_get_item_after_the_end_shows_an_error() -> None:
     assert error_of(make("GetItemNode"), items=["a"], index=5) == "list index out of range"
+
+
+# --- Flow ---
+
+
+@pytest.mark.parametrize("condition", [True, False])
+def test_branch_runs_the_output_for_the_condition(condition: bool) -> None:
+    graph = Graph()
+    start = graph.add_node(StartNode())
+    branch = graph.add_node(make("BranchNode"))
+    branch.pin("condition").default = condition
+    graph.connect(start.pin("then"), branch.pin("exec"))
+    logs: dict[str, list[Any]] = {"true": [], "false": []}
+    for name, log in logs.items():
+        graph.connect(branch.pin(name), graph.add_node(LogNode(log)).pin("exec"))
+
+    run_from(graph, start)
+
+    assert logs == {"true": [None] if condition else [], "false": [] if condition else [None]}
+
+
+def test_for_loop_runs_the_loop_body_for_each_index() -> None:
+    log: list[Any] = []
+    graph = Graph()
+    start = graph.add_node(StartNode())
+    loop = graph.add_node(make("ForLoopNode"))
+    loop.pin("first").default = 1
+    loop.pin("last").default = 3
+    body = graph.add_node(LogNode(log))
+    completed = graph.add_node(LogNode(log))
+    graph.connect(start.pin("then"), loop.pin("exec"))
+    graph.connect(loop.pin("loop body"), body.pin("exec"))
+    graph.connect(loop.pin("completed"), completed.pin("exec"))
+    graph.connect(loop.pin("index"), body.pin("value"))
+
+    run_from(graph, start)
+
+    assert log == [1, 2, 3, None]
+
+
+def test_for_each_runs_the_loop_body_for_each_item() -> None:
+    log: list[Any] = []
+    graph = Graph()
+    start = graph.add_node(StartNode())
+    loop = graph.add_node(make("ForEachNode"))
+    loop.pin("items").default = ["milk", "eggs"]
+    body = graph.add_node(LogNode(log))
+    graph.connect(start.pin("then"), loop.pin("exec"))
+    graph.connect(loop.pin("loop body"), body.pin("exec"))
+    graph.connect(loop.pin("item"), body.pin("value"))
+
+    run_from(graph, start)
+
+    assert log == ["milk", "eggs"]
+    assert loop.pin("index").value == 1
+
+
+def test_sequence_runs_its_outputs_in_order() -> None:
+    log: list[Any] = []
+    graph = Graph()
+    start = graph.add_node(StartNode())
+    sequence = graph.add_node(make("SequenceNode"))
+    graph.connect(start.pin("then"), sequence.pin("exec"))
+    for number, name in enumerate(["first", "second", "third"], start=1):
+        printer = graph.add_node(LogNode(log))
+        graph.connect(sequence.pin(name), printer.pin("exec"))
+        graph.connect(graph.add_node(NumberNode(number)).pin("value"), printer.pin("value"))
+
+    run_from(graph, start)
+
+    assert log == [1, 2, 3]
+
+
+def test_counter_counts_its_runs() -> None:
+    counter = make("CounterNode")
+    assert outputs(counter) == {"count": 1}
+    assert outputs(counter) == {"count": 2}

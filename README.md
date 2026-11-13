@@ -148,6 +148,15 @@ The code is in `node_editor/execution.py`.
 
 When you change a value or a connection, `Graph.mark_dirty` marks the node, and all nodes that use its values, as dirty. A clean node does not run again until it is dirty.
 
+### Branches and loops
+
+After an exec node runs, `run_from` usually follows all of its exec outputs. But a node can choose its exec outputs itself. In `compute()`, it calls `self.run_exec_output(name)`, and then `run_from` does not follow the outputs again. The code is in `example_project/flow_nodes.py`.
+
+- **Branch** runs only `true` or only `false`.
+- **For Loop** runs `loop body` one time for each number, with a new `index` each time. Then it runs `completed`.
+
+Before an exec output runs, `run_exec_output` marks the nodes that use the values of the node as dirty. Thus a pure node that uses `index` runs again for each new index.
+
 ## Make your own node
 
 Add a Python file to `example_project/`, for example `my_nodes.py`:
