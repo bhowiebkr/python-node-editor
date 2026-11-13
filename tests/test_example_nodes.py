@@ -155,3 +155,28 @@ def test_format_text_puts_the_values_into_the_template() -> None:
 
 def test_format_text_with_a_bad_template_shows_an_error() -> None:
     assert error_of(make("FormatTextNode", template="{d}")) == "'d'"
+
+
+# --- Lists ---
+
+
+@pytest.mark.parametrize(
+    ("class_name", "inputs", "expected"),
+    [
+        ("RangeNode", {"first": 1, "last": 4}, {"items": [1, 2, 3, 4]}),
+        ("LengthNode", {"items": ["a", "b"]}, {"length": 2}),
+        ("LengthNode", {"items": "hello"}, {"length": 5}),
+        ("SumNode", {"items": [1, 2, 3]}, {"total": 6}),
+        ("GetItemNode", {"items": ["a", "b", "c"], "index": 1}, {"item": "b"}),
+        ("GetItemNode", {"items": ["a", "b", "c"], "index": -1}, {"item": "c"}),
+        ("SortNode", {"items": ["milk", "eggs", "bread"]}, {"result": ["bread", "eggs", "milk"]}),
+        ("JoinListNode", {"items": [1, 2, 3]}, {"text": "1, 2, 3"}),
+        ("JoinListNode", {"items": ["a", "b"], "separator": "-"}, {"text": "a-b"}),
+    ],
+)
+def test_list_node_gives_the_result(class_name: str, inputs: dict[str, Any], expected: dict[str, Any]) -> None:
+    assert outputs(make(class_name), **inputs) == expected
+
+
+def test_get_item_after_the_end_shows_an_error() -> None:
+    assert error_of(make("GetItemNode"), items=["a"], index=5) == "list index out of range"
