@@ -1,0 +1,118 @@
+{
+    "nodes": [
+        {
+            "id": 1,
+            "type": "ButtonNode",
+            "x": -500,
+            "y": -220,
+            "state": {}
+        },
+        {
+            "id": 2,
+            "type": "ScalarNode",
+            "x": -500,
+            "y": -80,
+            "state": {
+                "value": 100.0
+            }
+        },
+        {
+            "id": 3,
+            "type": "ScalarNode",
+            "x": -500,
+            "y": 40,
+            "state": {
+                "value": 1.8
+            }
+        },
+        {
+            "id": 4,
+            "type": "MultiplyNode",
+            "x": -330,
+            "y": -10,
+            "state": {}
+        },
+        {
+            "id": 5,
+            "type": "ScalarNode",
+            "x": -330,
+            "y": 100,
+            "state": {
+                "value": 32.0
+            }
+        },
+        {
+            "id": 6,
+            "type": "AddNode",
+            "x": -150,
+            "y": 0,
+            "state": {}
+        },
+        {
+            "id": 7,
+            "type": "FormatTextNode",
+            "x": 10,
+            "y": -120,
+            "state": {
+                "template": "{a} Celsius = {b:.1f} Fahrenheit"
+            }
+        },
+        {
+            "id": 8,
+            "type": "PrintNode",
+            "x": 300,
+            "y": -220,
+            "state": {}
+        }
+    ],
+    "connections": [
+        {
+            "from_node": 1,
+            "from_pin": "clicked",
+            "to_node": 8,
+            "to_pin": "exec"
+        },
+        {
+            "from_node": 2,
+            "from_pin": "value",
+            "to_node": 4,
+            "to_pin": "a"
+        },
+        {
+            "from_node": 3,
+            "from_pin": "value",
+            "to_node": 4,
+            "to_pin": "b"
+        },
+        {
+            "from_node": 4,
+            "from_pin": "result",
+            "to_node": 6,
+            "to_pin": "a"
+        },
+        {
+            "from_node": 5,
+            "from_pin": "value",
+            "to_node": 6,
+            "to_pin": "b"
+        },
+        {
+            "from_node": 2,
+            "from_pin": "value",
+            "to_node": 7,
+            "to_pin": "a"
+        },
+        {
+            "from_node": 6,
+            "from_pin": "result",
+            "to_node": 7,
+            "to_pin": "b"
+        },
+        {
+            "from_node": 7,
+            "from_pin": "text",
+            "to_node": 8,
+            "to_pin": "value"
+        }
+    ]
+}

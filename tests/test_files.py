@@ -81,6 +81,7 @@ def run_example(file_name: str, capsys: pytest.CaptureFixture[str]) -> list[str]
     ("file_name", "expected"),
     [
         ("example.json", ["Print: 5.0"]),
+        ("temperature.json", ["Print: 100.0 Celsius = 212.0 Fahrenheit"]),
     ],
 )
 def test_example_graph_opens_and_runs(file_name: str, expected: list[str], capsys: pytest.CaptureFixture[str]) -> None:
