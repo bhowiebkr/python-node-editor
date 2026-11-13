@@ -1,7 +1,11 @@
-#!/bin/bash
+#!/bin/sh
+# Start the node editor with the Python in the "venv" folder.
+# Make the venv first. See "Quick start" in README.md.
+cd "$(dirname "$0")" || exit 1
 
-# Activate the virtual environment
-source venv/bin/activate
+if [ ! -x venv/bin/python ]; then
+    echo 'The venv folder was not found. See "Quick start" in README.md.'
+    exit 1
+fi
 
-# Start the Python program in a new terminal window
-python3 main.py
+exec venv/bin/python main.py
