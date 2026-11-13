@@ -61,3 +61,36 @@ def test_input_node_gives_its_value(class_name: str, state: dict[str, Any], expe
     node = make(class_name, **state)
     assert node.get_state() == state
     assert outputs(node) == expected
+
+
+# --- Math ---
+
+
+@pytest.mark.parametrize(
+    ("class_name", "inputs", "expected"),
+    [
+        ("AddNode", {"a": 2, "b": 3}, 5),
+        ("SubtractNode", {"a": 2, "b": 3}, -1),
+        ("MultiplyNode", {"a": 2, "b": 3}, 6),
+        ("DivideNode", {"a": 3, "b": 2}, 1.5),
+        ("ModuloNode", {"a": 7, "b": 3}, 1),
+        ("PowerNode", {"value": 3, "exponent": 2}, 9),
+        ("SquareRootNode", {"value": 9}, 3),
+        ("RoundNode", {"value": 2.567, "digits": 2}, 2.57),
+        ("RoundNode", {"value": 2.567}, 3),
+        ("MinNode", {"a": 2, "b": 3}, 2),
+        ("MaxNode", {"a": 2, "b": 3}, 3),
+    ],
+)
+def test_math_node_gives_the_result(class_name: str, inputs: dict[str, Any], expected: Any) -> None:
+    assert outputs(make(class_name), **inputs) == {"result": expected}
+
+
+def test_divide_by_zero_shows_an_error() -> None:
+    assert error_of(make("DivideNode"), a=1, b=0) == "division by zero"
+
+
+def test_random_integer_is_from_minimum_to_maximum() -> None:
+    node = make("RandomIntegerNode")
+    values = {outputs(node, minimum=1, maximum=3)["value"] for _ in range(100)}
+    assert values == {1, 2, 3}

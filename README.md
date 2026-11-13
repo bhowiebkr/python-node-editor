@@ -150,27 +150,27 @@ When you change a value or a connection, `Graph.mark_dirty` marks the node, and 
 
 ## Make your own node
 
-Add a Python file to `example_project/`, for example `multiply_node.py`:
+Add a Python file to `example_project/`, for example `my_nodes.py`:
 
 ```python
 from node_editor.node import Node
 
 
-class MultiplyNode(Node):
-    """Multiplies two numbers: result = a * b."""
+class AverageNode(Node):
+    """The average of two numbers: result = (a + b) / 2."""
 
-    title = "Multiply"
+    title = "Average"
     category = "Math"
-    color = (0, 128, 128)
+    color = (0, 128, 0)
 
     def __init__(self) -> None:
         super().__init__()
-        self.add_input("a", default=1.0)
-        self.add_input("b", default=1.0)
+        self.add_input("a", default=0.0)
+        self.add_input("b", default=0.0)
         self.add_output("result")
 
     def compute(self) -> None:
-        self.set_output("result", self.get_input("a") * self.get_input("b"))
+        self.set_output("result", (self.get_input("a") + self.get_input("b")) / 2)
 ```
 
 Start the editor again. The node is in the list, in the Math group.
