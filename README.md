@@ -106,6 +106,23 @@ The example graphs are in `example_project/`. Open a graph with **File > Open**,
 
 ![The shopping list graph](images/shopping_list.png)
 
+## The nodes
+
+Each group of nodes is in one file in `example_project/`. Read the files to see how each node works. The docstring of each node class tells what the node does.
+
+| Group | Nodes | File |
+| --- | --- | --- |
+| ![Events](https://img.shields.io/badge/Events-800000?style=flat-square) | Button | `event_nodes.py` |
+| ![Inputs](https://img.shields.io/badge/Inputs-FFA500?style=flat-square) | Scalar, Integer, Text, Boolean | `input_nodes.py` |
+| ![Math](https://img.shields.io/badge/Math-008000?style=flat-square) | Add, Subtract, Multiply, Divide, Modulo, Power, Square Root, Round, Min, Max, Random Integer | `math_nodes.py` |
+| ![Logic](https://img.shields.io/badge/Logic-1E64C8?style=flat-square) | Compare, And, Or, Not, Select | `logic_nodes.py` |
+| ![Text](https://img.shields.io/badge/Text-C85096?style=flat-square) | Join Text, Format Text, Upper Case, Lower Case, Replace Text, Split Text, Contains Text | `text_nodes.py` |
+| ![Lists](https://img.shields.io/badge/Lists-008C8C?style=flat-square) | Range, Length, Sum, Get Item, Sort, Join List | `list_nodes.py` |
+| ![Flow](https://img.shields.io/badge/Flow-6E6E6E?style=flat-square) | Branch, For Loop, For Each, Sequence, Counter | `flow_nodes.py` |
+| ![Debug](https://img.shields.io/badge/Debug-A020F0?style=flat-square) | Print, Log | `debug_nodes.py` |
+
+An input with no connection uses its default value. You cannot edit a default value in the editor, so the example graphs use the Inputs nodes for values.
+
 ## How the code works
 
 ### Model and GUI
@@ -158,7 +175,7 @@ Because of this, the items on the screen always agree with the graph.
 | `node_editor/gui/connection_item.py` | Draws a connection as a curve. |
 | `node_editor/gui/node_list.py` | The list of node types at the left side. |
 | `node_editor/gui/theme.py` | The dark colors and the style sheet. |
-| `example_project/` | The example nodes and the example graph. |
+| `example_project/` | The example nodes (one file for each group) and the example graphs. |
 | `tests/` | The tests. |
 
 ### Exec pins and data pins
