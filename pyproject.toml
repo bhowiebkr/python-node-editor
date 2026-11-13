@@ -28,4 +28,5 @@ files = ["main.py", "node_editor", "example_project", "tests"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]  # So that the tests can import node_editor.
 qt_api = "pyside6"

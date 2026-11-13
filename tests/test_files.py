@@ -1,0 +1,88 @@
+"""Tests for saving and opening graph files."""
+
+from __future__ import annotations
+
+import json
+import logging
+from pathlib import Path
+
+import pytest
+
+from node_editor.execution import run_graph
+from node_editor.graph import Graph
+from node_editor.loader import load_node_classes
+from tests.conftest import EXAMPLE_FOLDER
+from tests.helpers import NODE_CLASSES, NumberNode, SumNode
+
+
+def make_graph() -> Graph:
+    graph = Graph()
+    number = graph.add_node(NumberNode(4.5), x=10, y=20)
+    total = graph.add_node(SumNode(), x=200, y=20)
+    graph.connect(number.pin("value"), total.pin("a"))
+    return graph
+
+
+def test_save_and_open_give_the_same_graph(tmp_path: Path) -> None:
+    path = tmp_path / "graph.json"
+    make_graph().save(path)
+
+    graph = Graph()
+    graph.load(path, NODE_CLASSES)
+
+    assert graph.to_dict() == make_graph().to_dict()
+    number = graph.nodes[0]
+    assert isinstance(number, NumberNode)
+    assert number.value == 4.5
+    assert (number.x, number.y) == (10, 20)
+
+
+def test_new_node_after_open_gets_a_new_id() -> None:
+    graph = Graph()
+    graph.from_dict(make_graph().to_dict(), NODE_CLASSES)
+    assert graph.add_node(NumberNode()).id == 3
+
+
+def test_open_skips_unknown_node_types(caplog: pytest.LogCaptureFixture) -> None:
+    data = make_graph().to_dict()
+    data["nodes"][0]["type"] = "MissingNode"
+
+    graph = Graph()
+    with caplog.at_level(logging.WARNING):
+        graph.from_dict(data, NODE_CLASSES)
+
+    assert len(graph.nodes) == 1
+    assert graph.connections == []  # The connection used the missing node.
+    assert "MissingNode" in caplog.text
+
+
+def test_open_skips_bad_connections(caplog: pytest.LogCaptureFixture) -> None:
+    data = make_graph().to_dict()
+    data["connections"][0]["to_pin"] = "no such pin"
+
+    graph = Graph()
+    with caplog.at_level(logging.WARNING):
+        graph.from_dict(data, NODE_CLASSES)
+
+    assert len(graph.nodes) == 2
+    assert graph.connections == []
+    assert "Bad connection" in caplog.text
+
+
+def test_example_graph_opens_and_runs(capsys: pytest.CaptureFixture[str]) -> None:
+    graph = Graph()
+    graph.load(EXAMPLE_FOLDER / "example.json", load_node_classes(EXAMPLE_FOLDER))
+    assert len(graph.nodes) == 5
+    assert len(graph.connections) == 4
+
+    run_graph(graph)
+
+    assert "Print: 5.0" in capsys.readouterr().out
+
+
+def test_example_file_is_the_same_as_a_saved_file(tmp_path: Path) -> None:
+    graph = Graph()
+    graph.load(EXAMPLE_FOLDER / "example.json", load_node_classes(EXAMPLE_FOLDER))
+    graph.save(tmp_path / "copy.json")
+    saved = json.loads((tmp_path / "copy.json").read_text(encoding="utf-8"))
+    assert saved == json.loads((EXAMPLE_FOLDER / "example.json").read_text(encoding="utf-8"))
