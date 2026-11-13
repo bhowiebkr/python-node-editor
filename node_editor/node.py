@@ -59,6 +59,7 @@ class Node:
         self.pins: list[Pin] = []
         self.status = Status.DIRTY
         self.error = ""  # The error message when the status is ERROR.
+        self.chose_exec_output = False  # True after compute() calls run_exec_output().
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}(id={self.id})"
@@ -124,6 +125,20 @@ class Node:
     def set_output(self, name: str, value: Any) -> None:
         """Set the value of an output pin. Use this in compute()."""
         self.pin(name).value = value
+
+    def run_exec_output(self, name: str) -> None:
+        """Run the nodes that connect to the exec output `name`, now. Use this in compute().
+
+        Usually you do not need this method: after compute(), the graph runs all exec outputs.
+        If compute() calls this method, the graph does not do that. Use it to choose an output
+        (see the Branch node), or to run an output many times (see the For Loop node).
+        """
+        # Import here, not at the top, because execution.py imports this file.
+        from node_editor.execution import run_exec_output
+
+        self.chose_exec_output = True
+        if self.graph is not None:
+            run_exec_output(self.graph, self, name)
 
     def mark_dirty(self) -> None:
         """Tell the graph that a value in this node changed (for example, from its widget)."""

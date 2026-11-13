@@ -5,6 +5,9 @@ Exec pins decide WHEN a node runs. Data pins carry the VALUES.
 - An exec node has exec pins (for example Print). It runs when an exec connection reaches it.
 - A pure node has no exec pins (for example Add). It runs when another node needs its values.
 
+After an exec node runs, the nodes at its exec outputs run. A node can also choose which
+exec outputs run, and how many times (see Node.run_exec_output).
+
 Before a node runs, each data input gets the value of the output that connects to it.
 After the node runs, its status is CLEAN. If compute() raises an exception, the status is ERROR.
 """
@@ -36,14 +39,32 @@ def run_graph(graph: Graph) -> None:
 
 
 def run_from(graph: Graph, start: Node) -> None:
-    """Run `start`. Then follow its exec outputs, and run the next nodes in the same way."""
+    """Run `start`. Then follow its exec outputs, and run the next nodes in the same way.
+
+    If compute() of `start` called run_exec_output(), the node chose its exec outputs itself
+    (for example Branch), so this function does not follow them again.
+    """
+    start.chose_exec_output = False
     run_node(graph, start)
     if start.status is Status.ERROR:
         return  # Stop here. The next nodes do not run after an error.
+    if start.chose_exec_output:
+        return
 
     for pin in start.exec_outputs:
+        run_exec_output(graph, start, pin.name)
+
+
+def run_exec_output(graph: Graph, node: Node, name: str) -> None:
+    """Run the nodes that connect to the exec output `name` of `node`."""
+    # An exec node can give new values each time it runs (for example, the index of a loop).
+    # Mark the nodes that use its values as dirty, so that they run again with the new values.
+    for pin in node.data_outputs:
         for connection in graph.connections_of(pin):
-            run_from(graph, connection.end.node)
+            graph.mark_dirty(connection.end.node)
+
+    for connection in graph.connections_of(node.pin(name)):
+        run_from(graph, connection.end.node)
 
 
 def run_node(graph: Graph, node: Node) -> None:

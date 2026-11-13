@@ -70,6 +70,58 @@ class LogNode(Node):
         self.log.append(self.get_input("value"))
 
 
+class CountNode(Node):
+    """An exec node. Its output is the number of times that it ran."""
+
+    title = "Count"
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.count = 0
+        self.add_exec_input("exec")
+        self.add_exec_output("then")
+        self.add_output("count")
+
+    def compute(self) -> None:
+        self.count += 1
+        self.set_output("count", self.count)
+
+
+class ChooseNode(Node):
+    """An exec node that runs "yes" or "no", as the input "condition" tells."""
+
+    title = "Choose"
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.add_exec_input("exec")
+        self.add_exec_output("yes")
+        self.add_exec_output("no")
+        self.add_input("condition", default=False)
+
+    def compute(self) -> None:
+        self.run_exec_output("yes" if self.get_input("condition") else "no")
+
+
+class RepeatNode(Node):
+    """An exec node that runs "body" three times, with index 0, 1 and 2. Then it runs "done"."""
+
+    title = "Repeat"
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.add_exec_input("exec")
+        self.add_exec_output("body")
+        self.add_exec_output("done")
+        self.add_output("index")
+
+    def compute(self) -> None:
+        for index in range(3):
+            self.set_output("index", index)
+            self.run_exec_output("body")
+        self.run_exec_output("done")
+
+
 class FailNode(Node):
     """A pure node that always raises an exception."""
 

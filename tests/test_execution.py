@@ -7,7 +7,7 @@ from typing import Any
 from node_editor.execution import pure_nodes_needed_by, run_from, run_graph, run_node
 from node_editor.graph import Graph
 from node_editor.node import Status
-from tests.helpers import FailNode, LogNode, NumberNode, StartNode, SumNode
+from tests.helpers import ChooseNode, CountNode, FailNode, LogNode, NumberNode, RepeatNode, StartNode, SumNode
 
 
 def test_run_node_runs_the_pure_inputs_first() -> None:
@@ -118,3 +118,62 @@ def test_run_graph_starts_at_the_start_nodes() -> None:
     assert printer.status is Status.CLEAN
     assert lonely.status is Status.DIRTY
     assert total.status is Status.CLEAN
+
+
+def test_node_can_choose_its_exec_output() -> None:
+    log: list[Any] = []
+    graph = Graph()
+    start = graph.add_node(StartNode())
+    choose = graph.add_node(ChooseNode())
+    yes = graph.add_node(LogNode(log))
+    no = graph.add_node(LogNode(log))
+    graph.connect(start.pin("then"), choose.pin("exec"))
+    graph.connect(choose.pin("yes"), yes.pin("exec"))
+    graph.connect(choose.pin("no"), no.pin("exec"))
+
+    run_from(graph, start)
+
+    assert no.status is Status.CLEAN
+    assert yes.status is Status.DIRTY  # It did not run.
+    assert log == [None]
+
+
+def test_node_can_run_an_exec_output_many_times() -> None:
+    # The Sum node must run again for each index, because the index changes.
+    log: list[Any] = []
+    graph = Graph()
+    start = graph.add_node(StartNode())
+    repeat = graph.add_node(RepeatNode())
+    ten = graph.add_node(NumberNode(10))
+    total = graph.add_node(SumNode())
+    body = graph.add_node(LogNode(log))
+    done = graph.add_node(LogNode(log))
+    graph.connect(start.pin("then"), repeat.pin("exec"))
+    graph.connect(repeat.pin("body"), body.pin("exec"))
+    graph.connect(repeat.pin("done"), done.pin("exec"))
+    graph.connect(repeat.pin("index"), total.pin("a"))
+    graph.connect(ten.pin("value"), total.pin("b"))
+    graph.connect(total.pin("result"), body.pin("value"))
+
+    run_from(graph, start)
+
+    assert log == [10, 11, 12, None]
+    assert repeat.status is Status.CLEAN
+
+
+def test_new_value_from_an_exec_node_makes_its_users_run_again() -> None:
+    log: list[Any] = []
+    graph = Graph()
+    start = graph.add_node(StartNode())
+    count = graph.add_node(CountNode())
+    total = graph.add_node(SumNode())
+    printer = graph.add_node(LogNode(log))
+    graph.connect(start.pin("then"), count.pin("exec"))
+    graph.connect(count.pin("then"), printer.pin("exec"))
+    graph.connect(count.pin("count"), total.pin("a"))
+    graph.connect(total.pin("result"), printer.pin("value"))
+
+    run_from(graph, start)
+    run_from(graph, start)
+
+    assert log == [1, 2]
