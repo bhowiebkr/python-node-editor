@@ -1,0 +1,163 @@
+{
+    "nodes": [
+        {
+            "id": 1,
+            "type": "ButtonNode",
+            "x": -560,
+            "y": -260,
+            "state": {}
+        },
+        {
+            "id": 2,
+            "type": "TextNode",
+            "x": -560,
+            "y": -120,
+            "state": {
+                "text": "milk, eggs, bread, apples, rice"
+            }
+        },
+        {
+            "id": 3,
+            "type": "TextNode",
+            "x": -560,
+            "y": 0,
+            "state": {
+                "text": ","
+            }
+        },
+        {
+            "id": 4,
+            "type": "SplitTextNode",
+            "x": -300,
+            "y": -60,
+            "state": {}
+        },
+        {
+            "id": 5,
+            "type": "SortNode",
+            "x": -160,
+            "y": -40,
+            "state": {}
+        },
+        {
+            "id": 6,
+            "type": "ForEachNode",
+            "x": -10,
+            "y": -260,
+            "state": {}
+        },
+        {
+            "id": 7,
+            "type": "FormatTextNode",
+            "x": -10,
+            "y": -90,
+            "state": {
+                "template": "- {a}"
+            }
+        },
+        {
+            "id": 8,
+            "type": "LogNode",
+            "x": 280,
+            "y": -300,
+            "state": {}
+        },
+        {
+            "id": 9,
+            "type": "LengthNode",
+            "x": -10,
+            "y": 80,
+            "state": {}
+        },
+        {
+            "id": 10,
+            "type": "FormatTextNode",
+            "x": 140,
+            "y": 60,
+            "state": {
+                "template": "{a} items"
+            }
+        },
+        {
+            "id": 11,
+            "type": "PrintNode",
+            "x": 420,
+            "y": 20,
+            "state": {}
+        }
+    ],
+    "connections": [
+        {
+            "from_node": 1,
+            "from_pin": "clicked",
+            "to_node": 6,
+            "to_pin": "exec"
+        },
+        {
+            "from_node": 2,
+            "from_pin": "text",
+            "to_node": 4,
+            "to_pin": "text"
+        },
+        {
+            "from_node": 3,
+            "from_pin": "text",
+            "to_node": 4,
+            "to_pin": "separator"
+        },
+        {
+            "from_node": 4,
+            "from_pin": "items",
+            "to_node": 5,
+            "to_pin": "items"
+        },
+        {
+            "from_node": 5,
+            "from_pin": "result",
+            "to_node": 6,
+            "to_pin": "items"
+        },
+        {
+            "from_node": 6,
+            "from_pin": "loop body",
+            "to_node": 8,
+            "to_pin": "exec"
+        },
+        {
+            "from_node": 6,
+            "from_pin": "item",
+            "to_node": 7,
+            "to_pin": "a"
+        },
+        {
+            "from_node": 7,
+            "from_pin": "text",
+            "to_node": 8,
+            "to_pin": "value"
+        },
+        {
+            "from_node": 5,
+            "from_pin": "result",
+            "to_node": 9,
+            "to_pin": "items"
+        },
+        {
+            "from_node": 9,
+            "from_pin": "length",
+            "to_node": 10,
+            "to_pin": "a"
+        },
+        {
+            "from_node": 6,
+            "from_pin": "completed",
+            "to_node": 11,
+            "to_pin": "exec"
+        },
+        {
+            "from_node": 10,
+            "from_pin": "text",
+            "to_node": 11,
+            "to_pin": "value"
+        }
+    ]
+}

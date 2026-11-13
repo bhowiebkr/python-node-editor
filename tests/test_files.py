@@ -86,6 +86,10 @@ def run_example(file_name: str, capsys: pytest.CaptureFixture[str]) -> list[str]
         ("word_count.json", ["Print: THE CAT SAT ON THE MAT", "Print: 6 words"]),
         ("pass_or_fail.json", ["Print: Pass"]),
         ("times_table.json", [f"Log: {n} x 7 = {n * 7}" for n in range(1, 11)]),
+        (
+            "shopping_list.json",
+            ["Log: - apples", "Log: - bread", "Log: - eggs", "Log: - milk", "Log: - rice", "Print: 5 items"],
+        ),
     ],
 )
 def test_example_graph_opens_and_runs(file_name: str, expected: list[str], capsys: pytest.CaptureFixture[str]) -> None:
