@@ -1,71 +1,49 @@
+"""The list of node types at the left side of the window."""
+
 from __future__ import annotations
 
-from types import ModuleType
-from typing import Any
-from typing import Dict
-from typing import Optional
-from typing import Union
+from collections.abc import Sequence
 
-from PySide6 import QtCore
-from PySide6 import QtGui
-from PySide6 import QtWidgets
+from PySide6.QtCore import QByteArray, QMimeData, Qt
+from PySide6.QtWidgets import QAbstractItemView, QTreeWidget, QTreeWidgetItem, QWidget
 
+from node_editor.node import Node
 
-class CustomQListWidgetItem(QtWidgets.QListWidgetItem):  # type: ignore
-    module: Any
-    class_name: Any
+# The drag data type. The data is the class name of the node.
+NODE_MIME_TYPE = "application/x-python-node-editor-node"
 
 
-class CustomQMimeData(QtCore.QMimeData):  # type: ignore
-    item: CustomQListWidgetItem
+class NodeList(QTreeWidget):
+    """Shows the node types in groups (the `category` of each node class).
 
+    Drag a node type into the view to add a node.
+    """
 
-class ImportData:
-    def __init__(self, module: str, class_: str):
-        self.module: Any = module
-        self.class_: Any = class_
-
-
-# class NodeList(QtWidgets.QListWidget):  # type: ignore
-#    module: str
-#    class_: str
-
-
-class NodeList(QtWidgets.QListWidget):  # type: ignore
-    def __init__(self, parent: Optional[QtWidgets.QWidget] = None) -> None:
+    def __init__(self, node_classes: dict[str, type[Node]], parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        self.setDragEnabled(True)  # enable dragging
+        self.setHeaderHidden(True)
+        self.setDragEnabled(True)
+        self.setDragDropMode(QAbstractItemView.DragDropMode.DragOnly)
 
-    def update_project(self, imports: Dict[str, Dict[str, Union[type, ModuleType]]]) -> None:
+        categories: dict[str, QTreeWidgetItem] = {}
+        for class_name, node_class in sorted(node_classes.items(), key=lambda item: (item[1].category, item[1].title)):
+            if node_class.category not in categories:
+                category_item = QTreeWidgetItem(self, [node_class.category])
+                category_item.setFlags(Qt.ItemFlag.ItemIsEnabled)  # You cannot drag a group.
+                categories[node_class.category] = category_item
 
-        # make an item for each custom class
-        for name, data in imports.items():
-            name = name.replace("_Node", "")
+            item = QTreeWidgetItem(categories[node_class.category], [node_class.title])
+            item.setData(0, Qt.ItemDataRole.UserRole, class_name)
+            item.setToolTip(0, node_class.__doc__ or "")
+        self.expandAll()
 
-            item = CustomQListWidgetItem(name)
+    def mimeTypes(self) -> list[str]:
+        return [NODE_MIME_TYPE]
 
-            item.module = data["module"]
-            item.class_name = data["class"]
-            self.addItem(item)
-
-    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
-        item = self.itemAt(event.pos())
-
-        if isinstance(item, CustomQListWidgetItem) and item.text():
-            name = item.text()
-
-            drag = QtGui.QDrag(self)
-            mime_data = CustomQMimeData()
-            mime_data.setText(name)
-            mime_data.item = item
-            drag.setMimeData(mime_data)
-
-            # Drag needs a pixmap or else it'll error due to a null pixmap
-            pixmap = QtGui.QPixmap(16, 16)
-            pixmap.fill(QtGui.QColor("darkgray"))
-            drag.setPixmap(pixmap)
-            drag.exec_()
-
-            print("Inside drag event from node list")
-
-            super().mousePressEvent(event)
+    def mimeData(self, items: Sequence[QTreeWidgetItem]) -> QMimeData:
+        """Make the drag data: the class name of the dragged node type."""
+        mime_data = QMimeData()
+        class_name = items[0].data(0, Qt.ItemDataRole.UserRole) if items else None
+        if class_name:
+            mime_data.setData(NODE_MIME_TYPE, QByteArray(class_name.encode()))
+        return mime_data

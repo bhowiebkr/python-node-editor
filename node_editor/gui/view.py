@@ -1,223 +1,122 @@
+"""The Qt view that shows the scene, with a grid in the background."""
+
 from __future__ import annotations
 
-from typing import Optional
+import math
 
-from PySide6 import QtCore
-from PySide6 import QtGui
-from PySide6 import QtOpenGLWidgets
-from PySide6 import QtWidgets
+from PySide6.QtCore import QLineF, QPointF, QRect, QRectF, Qt, Signal
+from PySide6.QtGui import QColor, QDragEnterEvent, QDragMoveEvent, QDropEvent, QMouseEvent, QPainter, QPen, QWheelEvent
+from PySide6.QtWidgets import QFrame, QGraphicsScene, QGraphicsView, QWidget
 
-from node_editor.node import Node
+from node_editor.gui.node_list import NODE_MIME_TYPE
+
+BACKGROUND_COLOR = QColor(38, 38, 38)
+FINE_GRID = 15
+FINE_PEN = QPen(QColor(52, 52, 52), 0.5)
+COARSE_GRID = 150
+COARSE_PEN = QPen(QColor(22, 22, 22), 1.0)
+
+ZOOM_STEP = 1.2  # The zoom factor for one step of the mouse wheel.
+MIN_ZOOM = 0.2
+MAX_ZOOM = 3.0
 
 
-class View(QtWidgets.QGraphicsView):  # type: ignore
+class NodeView(QGraphicsView):
+    """Shows the scene.
+
+    - Mouse wheel: zoom in and out.
+    - Middle mouse button: move the view (pan).
+    - Left mouse button on the background: select the nodes in a box.
+    - Drop a node type from the node list to add a node.
     """
-    View class for node editor.
-    """
 
-    _background_color: QtGui.QColor = QtGui.QColor(38, 38, 38)
+    node_dropped = Signal(str, QPointF)  # The class name of the node, and the drop position in the scene.
 
-    _grid_pen_s: QtGui.QPen = QtGui.QPen(QtGui.QColor(52, 52, 52, 255), 0.5)
-    _grid_pen_l: QtGui.QPen = QtGui.QPen(QtGui.QColor(22, 22, 22, 255), 1.0)
+    def __init__(self, scene: QGraphicsScene, parent: QWidget | None = None) -> None:
+        super().__init__(scene, parent)
+        self.setRenderHints(QPainter.RenderHint.Antialiasing | QPainter.RenderHint.TextAntialiasing)
+        self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
+        self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        self.setAcceptDrops(True)
+        self._pan_start: QPointF | None = None
 
-    _grid_size_fine: int = 15
-    _grid_size_course: int = 150
+    def center_on_nodes(self) -> None:
+        self.centerOn(self.scene().itemsBoundingRect().center())
 
-    _mouse_wheel_zoom_rate: float = 0.0015
+    def drawBackground(self, painter: QPainter, rect: QRectF | QRect) -> None:
+        rect = QRectF(rect)
+        painter.fillRect(rect, BACKGROUND_COLOR)
+        self._draw_grid(painter, rect, FINE_GRID, FINE_PEN)
+        self._draw_grid(painter, rect, COARSE_GRID, COARSE_PEN)
 
-    request_node = QtCore.Signal(object, int)
-
-    def __init__(self, parent: QtWidgets.QWidget) -> None:
-        super().__init__(parent)
-        self.setRenderHint(QtGui.QPainter.Antialiasing)
-        self._manipulationMode: int = 0
-
-        gl_format: QtGui.QSurfaceFormat = QtGui.QSurfaceFormat()
-        gl_format.setSamples(10)
-        QtGui.QSurfaceFormat.setDefaultFormat(gl_format)
-        gl_widget: QtOpenGLWidgets.QOpenGLWidget = QtOpenGLWidgets.QOpenGLWidget()
-
-        self.currentScale: float = 1
-        self._pan: bool = False
-        self._pan_start_x: int = 0
-        self._pan_start_y: int = 0
-        self._numScheduledScalings: int = 0
-        self.lastMousePos: QtCore.QPoint = QtCore.QPoint()
-        self.anim: Optional[QtCore.QTimeLine] = None
-
-        self.setViewport(gl_widget)
-
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setFrameShape(QtWidgets.QFrame.NoFrame)
-
-    def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
-        """
-        Handles the wheel events, e.g. zoom in/out.
-
-        :param event: Wheel event.
-        """
-        # sometimes you can triger the wheen when panning so we disable when panning
-        if self._pan:
-            return
-
-        num_degrees = event.angleDelta() / 8.0
-        num_steps = num_degrees.y() / 5.0
-        self._numScheduledScalings += num_steps
-
-        # If the user moved the wheel another direction, we reset previously scheduled scalings
-        if self._numScheduledScalings * num_steps < 0:
-            self._numScheduledScalings = num_steps
-
-        self.anim = QtCore.QTimeLine(350)
-        self.anim.setUpdateInterval(20)
-
-        self.anim.valueChanged.connect(self.scaling_time)
-        self.anim.finished.connect(self.anim_finished)
-        self.anim.start()
-
-    def scaling_time(self, x: float) -> None:
-        """
-        Updates the current scale based on the wheel events.
-
-        :param x: The value of the current time.
-        """
-        factor = 1.0 + self._numScheduledScalings / 300.0
-
-        self.currentScale *= factor
-
-        self.scale(factor, factor)
-
-    def anim_finished(self) -> None:
-        """
-        Called when the zoom animation is finished.
-        """
-        if self._numScheduledScalings > 0:
-            self._numScheduledScalings -= 1
-        else:
-            self._numScheduledScalings += 1
-
-    def drawBackground(self, painter: QtGui.QPainter, rect: QtCore.QRectF) -> None:
-        """
-        Draws the background for the node editor view.
-
-        :param painter: The painter to draw with.
-        :param rect: The rectangle to be drawn.
-        """
-        painter.fillRect(rect, self._background_color)
-
-        left = int(rect.left()) - (int(rect.left()) % self._grid_size_fine)
-        top = int(rect.top()) - (int(rect.top()) % self._grid_size_fine)
-
-        # Draw horizontal fine lines
-        gridLines = []
-        painter.setPen(self._grid_pen_s)
-        y = float(top)
-        while y < float(rect.bottom()):
-            gridLines.append(QtCore.QLineF(rect.left(), y, rect.right(), y))
-            y += self._grid_size_fine
-        painter.drawLines(gridLines)
-
-        # Draw vertical fine lines
-        gridLines = []
-        painter.setPen(self._grid_pen_s)
-        x = float(left)
-        while x < float(rect.right()):
-            gridLines.append(QtCore.QLineF(x, rect.top(), x, rect.bottom()))
-            x += self._grid_size_fine
-        painter.drawLines(gridLines)
-
-        # Draw thick grid
-        left = int(rect.left()) - (int(rect.left()) % self._grid_size_course)
-        top = int(rect.top()) - (int(rect.top()) % self._grid_size_course)
-
-        # Draw vertical thick lines
-        gridLines = []
-        painter.setPen(self._grid_pen_l)
-        x = left
+    def _draw_grid(self, painter: QPainter, rect: QRectF, step: int, pen: QPen) -> None:
+        lines = []
+        x = math.floor(rect.left() / step) * step
         while x < rect.right():
-            gridLines.append(QtCore.QLineF(x, rect.top(), x, rect.bottom()))
-            x += self._grid_size_course
-        painter.drawLines(gridLines)
-
-        # Draw horizontal thick lines
-        gridLines = []
-        painter.setPen(self._grid_pen_l)
-        y = top
+            lines.append(QLineF(x, rect.top(), x, rect.bottom()))
+            x += step
+        y = math.floor(rect.top() / step) * step
         while y < rect.bottom():
-            gridLines.append(QtCore.QLineF(rect.left(), y, rect.right(), y))
-            y += self._grid_size_course
-        painter.drawLines(gridLines)
+            lines.append(QLineF(rect.left(), y, rect.right(), y))
+            y += step
+        painter.setPen(pen)
+        painter.drawLines(lines)
 
-        super().drawBackground(painter, rect)
+    # --- Zoom ---
 
-    def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
-        """
-        This method is called when a context menu event is triggered in the view. It finds the item at the
-        event position and shows a context menu if the item is a Node.
-        """
-        item = self.itemAt(event.pos())
+    def wheelEvent(self, event: QWheelEvent) -> None:
+        factor = ZOOM_STEP ** (event.angleDelta().y() / 120)  # One wheel step is 120.
+        new_zoom = self.transform().m11() * factor
+        if MIN_ZOOM <= new_zoom <= MAX_ZOOM:
+            self.scale(factor, factor)
 
-        if item:
-            if isinstance(item, Node):
-                print("Found Node", item)
+    # --- Pan with the middle mouse button ---
 
-    def dragEnterEvent(self, e: QtGui.QDragEnterEvent) -> None:
-        """
-        This method is called when a drag and drop event enters the view. It checks if the mime data format
-        is "text/plain" and accepts or ignores the event accordingly.
-        """
-        if e.mimeData().hasFormat("text/plain"):
-            e.accept()
-        else:
-            e.ignore()
-
-    def dropEvent(self, e: QtGui.QDropEvent) -> None:
-        """
-        This method is called when a drag and drop event is dropped onto the view. It retrieves the name of the
-        dropped node from the mime data and emits a signal to request the creation of the corresponding node.
-        """
-        node = e.mimeData().item.class_name
-        next_index = self.scene().get_total_nodes()
-        self.request_node.emit(node(), next_index)
-
-    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
-        """
-        This method is called when a mouse press event occurs in the view. It sets the cursor to a closed
-        hand cursor and enables panning if the middle mouse button is pressed.
-        """
-        if event.button() == QtCore.Qt.MiddleButton:
-            self._pan = True
-            self._pan_start_x = event.x()
-            self._pan_start_y = event.y()
-            self.setCursor(QtCore.Qt.ClosedHandCursor)
-
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        if event.button() == Qt.MouseButton.MiddleButton:
+            self._pan_start = event.position()
+            self.setCursor(Qt.CursorShape.ClosedHandCursor)
+            return
         super().mousePressEvent(event)
 
-    def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
-        """
-        This method is called when a mouse release event occurs in the view. It sets the cursor back to the
-        arrow cursor and disables panning if the middle mouse button is released.
-        """
-        if event.button() == QtCore.Qt.MiddleButton:
-            self._pan = False
-            self.setCursor(QtCore.Qt.ArrowCursor)
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        if self._pan_start is not None:
+            delta = event.position() - self._pan_start
+            self._pan_start = event.position()
+            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - round(delta.x()))
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - round(delta.y()))
+            return
+        super().mouseMoveEvent(event)
 
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        if event.button() == Qt.MouseButton.MiddleButton:
+            self._pan_start = None
+            self.unsetCursor()
+            return
         super().mouseReleaseEvent(event)
 
-    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
-        """
-        This method is called when a mouse move event occurs in the view. It pans the view if the middle mouse button is
-        pressed and moves the mouse.
-        """
-        if self._pan:
-            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - (event.x() - self._pan_start_x))
+    # --- Drop a node type from the node list ---
 
-            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - (event.y() - self._pan_start_y))
+    def dragEnterEvent(self, event: QDragEnterEvent) -> None:
+        if event.mimeData().hasFormat(NODE_MIME_TYPE):
+            event.acceptProposedAction()
+        else:
+            super().dragEnterEvent(event)
 
-            self._pan_start_x = event.x()
-            self._pan_start_y = event.y()
+    def dragMoveEvent(self, event: QDragMoveEvent) -> None:
+        if event.mimeData().hasFormat(NODE_MIME_TYPE):
+            event.acceptProposedAction()
+        else:
+            super().dragMoveEvent(event)
 
-        super().mouseMoveEvent(event)
+    def dropEvent(self, event: QDropEvent) -> None:
+        if not event.mimeData().hasFormat(NODE_MIME_TYPE):
+            super().dropEvent(event)
+            return
+        data = event.mimeData().data(NODE_MIME_TYPE)  # A QByteArray.
+        class_name = bytes(data.data()).decode()
+        self.node_dropped.emit(class_name, self.mapToScene(event.position().toPoint()))
+        event.acceptProposedAction()

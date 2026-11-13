@@ -19,7 +19,7 @@ select = [
 
 [tool.ruff.lint.pep8-naming]
 # Qt calls these methods by name, so they must keep the Qt (camelCase) names.
-extend-ignore-names = ["*Event", "boundingRect", "drawBackground", "itemChange"]
+extend-ignore-names = ["*Event", "boundingRect", "drawBackground", "itemChange", "mimeData", "mimeTypes"]
 
 [tool.mypy]
 python_version = "3.10"
