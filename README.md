@@ -1,5 +1,7 @@
 # Python Node Editor
 
+[![CI](https://github.com/bhowiebkr/python-node-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/bhowiebkr/python-node-editor/actions/workflows/ci.yml)
+
 A small node editor in Python and PySide6, made to be easy to read and learn from.
 
 The full editor is about 1,500 lines of Python, with comments. Read the code to learn how a node editor works: nodes, pins, connections, run order, save and open.
@@ -218,6 +220,8 @@ ruff format .       # Format the code.
 mypy                # Check the type hints.
 pre-commit install  # Run ruff before each commit.
 ```
+
+GitHub Actions runs the same checks on each push and pull request. The tests run on Linux and Windows, and with the oldest supported versions (Python 3.10 and PySide6 6.5).
 
 ## Ideas to try
 
