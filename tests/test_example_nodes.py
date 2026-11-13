@@ -122,3 +122,36 @@ def test_compare_uses_the_selected_comparison(comparison: str, expected: bool) -
 )
 def test_logic_node_gives_the_result(class_name: str, inputs: dict[str, Any], expected: Any) -> None:
     assert outputs(make(class_name), **inputs) == {"result": expected}
+
+
+# --- Text ---
+
+
+@pytest.mark.parametrize(
+    ("class_name", "inputs", "expected"),
+    [
+        ("JoinTextNode", {"a": "Hello, ", "b": "World"}, {"text": "Hello, World"}),
+        ("JoinTextNode", {"a": "Total: ", "b": 5}, {"text": "Total: 5"}),
+        ("UpperCaseNode", {"text": "Hello"}, {"result": "HELLO"}),
+        ("LowerCaseNode", {"text": "Hello"}, {"result": "hello"}),
+        ("ReplaceTextNode", {"text": "a-b-c", "old": "-", "new": "+"}, {"result": "a+b+c"}),
+        ("SplitTextNode", {"text": "the quick  fox"}, {"items": ["the", "quick", "fox"]}),
+        ("SplitTextNode", {"text": "milk, eggs,bread", "separator": ","}, {"items": ["milk", "eggs", "bread"]}),
+        ("ContainsTextNode", {"text": "Hello, World", "part": "World"}, {"result": True}),
+        ("ContainsTextNode", {"text": "Hello, World", "part": "world"}, {"result": False}),
+    ],
+)
+def test_text_node_gives_the_result(class_name: str, inputs: dict[str, Any], expected: dict[str, Any]) -> None:
+    assert outputs(make(class_name), **inputs) == expected
+
+
+def test_format_text_puts_the_values_into_the_template() -> None:
+    node = make("FormatTextNode", template="{a} x {b} = {c}")
+    assert outputs(node, a=3, b=7, c=21) == {"text": "3 x 7 = 21"}
+
+    node = make("FormatTextNode", template="{a:.2f}")
+    assert outputs(node, a=2.0) == {"text": "2.00"}
+
+
+def test_format_text_with_a_bad_template_shows_an_error() -> None:
+    assert error_of(make("FormatTextNode", template="{d}")) == "'d'"
