@@ -321,10 +321,6 @@ A node editor is not good for:
 - Code that must run fast.
 - Code that does not need a GUI.
 
-## Video
-
-[A video of an older version](https://www.youtube.com/watch?v=DOsFJ8lm9dU)
-
 ## License
 
 MIT. See [LICENSE](LICENSE).
