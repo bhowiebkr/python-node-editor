@@ -302,7 +302,7 @@ These changes are good exercises:
 - Undo and redo. Make each graph change a command on a `QUndoStack`.
 - Ask to save the changes before New, Open and Quit.
 - Copy and paste nodes. `Graph.to_dict` already makes the data.
-- A Branch node with two exec outputs, "true" and "false".
+- Edit the default value of an input in the node, so that you do not need an Inputs node for each value.
 - Pin types with different colors. Refuse connections between pins of different types.
 - Run the graph each time a value changes.
 
