@@ -1,0 +1,159 @@
+{
+    "nodes": [
+        {
+            "id": 1,
+            "type": "ButtonNode",
+            "x": -720,
+            "y": -260,
+            "state": {}
+        },
+        {
+            "id": 2,
+            "type": "SequenceNode",
+            "x": -580,
+            "y": -260,
+            "state": {}
+        },
+        {
+            "id": 3,
+            "type": "IntegerNode",
+            "x": -660,
+            "y": -40,
+            "state": {
+                "value": 1
+            }
+        },
+        {
+            "id": 4,
+            "type": "IntegerNode",
+            "x": -660,
+            "y": 80,
+            "state": {
+                "value": 6
+            }
+        },
+        {
+            "id": 5,
+            "type": "RandomIntegerNode",
+            "x": -420,
+            "y": -150,
+            "state": {}
+        },
+        {
+            "id": 6,
+            "type": "RandomIntegerNode",
+            "x": -420,
+            "y": 30,
+            "state": {}
+        },
+        {
+            "id": 7,
+            "type": "AddNode",
+            "x": -215,
+            "y": -50,
+            "state": {}
+        },
+        {
+            "id": 8,
+            "type": "FormatTextNode",
+            "x": 60,
+            "y": -130,
+            "state": {
+                "template": "{a} + {b} = {c}"
+            }
+        },
+        {
+            "id": 9,
+            "type": "LogNode",
+            "x": 320,
+            "y": -216,
+            "state": {}
+        }
+    ],
+    "connections": [
+        {
+            "from_node": 1,
+            "from_pin": "clicked",
+            "to_node": 2,
+            "to_pin": "exec"
+        },
+        {
+            "from_node": 2,
+            "from_pin": "first",
+            "to_node": 5,
+            "to_pin": "exec"
+        },
+        {
+            "from_node": 2,
+            "from_pin": "second",
+            "to_node": 6,
+            "to_pin": "exec"
+        },
+        {
+            "from_node": 2,
+            "from_pin": "third",
+            "to_node": 9,
+            "to_pin": "exec"
+        },
+        {
+            "from_node": 3,
+            "from_pin": "value",
+            "to_node": 5,
+            "to_pin": "minimum"
+        },
+        {
+            "from_node": 4,
+            "from_pin": "value",
+            "to_node": 5,
+            "to_pin": "maximum"
+        },
+        {
+            "from_node": 3,
+            "from_pin": "value",
+            "to_node": 6,
+            "to_pin": "minimum"
+        },
+        {
+            "from_node": 4,
+            "from_pin": "value",
+            "to_node": 6,
+            "to_pin": "maximum"
+        },
+        {
+            "from_node": 5,
+            "from_pin": "value",
+            "to_node": 7,
+            "to_pin": "a"
+        },
+        {
+            "from_node": 6,
+            "from_pin": "value",
+            "to_node": 7,
+            "to_pin": "b"
+        },
+        {
+            "from_node": 5,
+            "from_pin": "value",
+            "to_node": 8,
+            "to_pin": "a"
+        },
+        {
+            "from_node": 6,
+            "from_pin": "value",
+            "to_node": 8,
+            "to_pin": "b"
+        },
+        {
+            "from_node": 7,
+            "from_pin": "result",
+            "to_node": 8,
+            "to_pin": "c"
+        },
+        {
+            "from_node": 8,
+            "from_pin": "text",
+            "to_node": 9,
+            "to_pin": "value"
+        }
+    ]
+}

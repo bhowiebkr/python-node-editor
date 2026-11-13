@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from pathlib import Path
 
 import pytest
@@ -89,6 +90,16 @@ def run_example(file_name: str, capsys: pytest.CaptureFixture[str]) -> list[str]
 )
 def test_example_graph_opens_and_runs(file_name: str, expected: list[str], capsys: pytest.CaptureFixture[str]) -> None:
     assert run_example(file_name, capsys) == expected
+
+
+def test_dice_example_adds_two_dice(capsys: pytest.CaptureFixture[str]) -> None:
+    [line] = run_example("dice.json", capsys)
+    match = re.fullmatch(r"Log: (\d+) \+ (\d+) = (\d+)", line)
+    assert match is not None
+    first, second, total = (int(number) for number in match.groups())
+    assert 1 <= first <= 6
+    assert 1 <= second <= 6
+    assert total == first + second
 
 
 @pytest.mark.parametrize("path", sorted(EXAMPLE_FOLDER.glob("*.json")), ids=lambda path: path.name)
