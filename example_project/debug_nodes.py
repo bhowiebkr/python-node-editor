@@ -1,4 +1,7 @@
-"""An exec node: it runs when an exec connection reaches it."""
+"""Debug nodes. They show values, so that you can see what the graph does.
+
+These are exec nodes: they run when an exec connection reaches them.
+"""
 
 from __future__ import annotations
 

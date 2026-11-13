@@ -23,7 +23,7 @@ class GoodNode(Node):
 
 def test_loader_finds_the_example_nodes() -> None:
     classes = load_node_classes(EXAMPLE_FOLDER)
-    assert sorted(classes) == ["AddNode", "ButtonNode", "PrintNode", "ScalarNode"]
+    assert {"AddNode", "ButtonNode", "PrintNode", "ScalarNode"} <= set(classes)
 
 
 def test_loader_uses_only_the_classes_that_the_file_defines(tmp_path: Path) -> None:

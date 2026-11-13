@@ -1,4 +1,7 @@
-"""A start node: a click on its button runs the nodes that connect to its exec output."""
+"""Event nodes. An event node starts a run.
+
+A start node has exec outputs and no exec inputs. Run Graph runs each start node.
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,7 @@
-"""A pure node with a widget. The graph file keeps the number (see get_state and set_state)."""
+"""Input nodes. Each one has a widget, where you type or select a value.
+
+The graph file keeps the value (see get_state and set_state).
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,7 @@
-"""A pure node: it has no exec pins, so it runs when another node needs its result."""
+"""Math nodes.
+
+These are pure nodes: they have no exec pins, so they run when another node needs their result.
+"""
 
 from __future__ import annotations
 

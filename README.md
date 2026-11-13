@@ -179,9 +179,9 @@ Some rules:
 
 - The loader finds each subclass of `Node` in each file. One file can have many node classes.
 - The loader skips files with a name that starts with `_`, for example `__init__.py`.
-- To make an exec node, add exec pins with `add_exec_input()` and `add_exec_output()`. See `print_node.py`.
-- To add a widget to a node, return it from `create_widget()`. See `scalar_node.py`.
-- To save values in the graph file, override `get_state()` and `set_state()`. See `scalar_node.py`.
+- To make an exec node, add exec pins with `add_exec_input()` and `add_exec_output()`. See `debug_nodes.py`.
+- To add a widget to a node, return it from `create_widget()`. See `input_nodes.py`.
+- To save values in the graph file, override `get_state()` and `set_state()`. See `input_nodes.py`.
 - The graph file keeps the class name. If you rename a class, old graph files cannot find it.
 
 ## Graph file format
