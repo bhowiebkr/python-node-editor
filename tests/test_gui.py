@@ -239,3 +239,10 @@ def test_error_shows_in_the_tooltip(window: MainWindow) -> None:
     window.run_graph()
     assert window.scene.node_items[fail].toolTip() == "boom"
     assert "errors in 1 nodes" in window.message.text()
+
+
+def test_each_example_node_can_be_shown(window: MainWindow) -> None:
+    window.graph.clear()
+    for node_class in window.node_classes.values():
+        window.graph.add_node(node_class())
+    assert len(window.scene.node_items) == len(window.node_classes)
