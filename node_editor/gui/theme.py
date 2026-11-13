@@ -90,6 +90,37 @@ QSplitter::handle {
 QSplitter::handle:horizontal {
     width: 3px;
 }
+QScrollBar:vertical {
+    background: transparent;
+    width: 10px;
+    margin: 0;
+}
+QScrollBar:horizontal {
+    background: transparent;
+    height: 10px;
+    margin: 0;
+}
+QScrollBar::handle {
+    background: #4a4a4a;
+    border-radius: 3px;
+    margin: 2px;
+}
+QScrollBar::handle:vertical {
+    min-height: 24px;
+}
+QScrollBar::handle:horizontal {
+    min-width: 24px;
+}
+QScrollBar::handle:hover {
+    background: #5e5e5e;
+}
+QScrollBar::add-line, QScrollBar::sub-line {
+    width: 0;
+    height: 0;
+}
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+}
 """
 
 
