@@ -40,7 +40,7 @@ On Linux, Qt needs some system libraries. If the editor does not start on Debian
 
 ## How to use the editor
 
-The editor opens `example_project/example.json`. Click **Run Graph**. The Print node shows `5.0` (2 + 3), and all status squares become green.
+The editor opens `example_project/example.json`. Click **Run Graph**. The Print node shows `5.0` (2 + 3), and all status squares become green. To open one of the other [example graphs](#example-graphs), use **File > Open**.
 
 | To do this | Do this |
 | --- | --- |
@@ -59,6 +59,52 @@ The square at the top right of each node shows its status:
 - Orange (dirty): an input changed after the last run.
 - Green (clean): the outputs are up to date.
 - Red (error): the node raised an exception. Put the mouse on the node to see the error.
+
+## Example graphs
+
+The example graphs are in `example_project/`. Open a graph with **File > Open**, then click **Run Graph**. The values also go to the console. The tests run each example graph (`tests/test_files.py`).
+
+### Add two numbers
+
+`example.json`: the graph that the editor opens first. Add adds 2 and 3, and Print shows the result.
+
+![Add two numbers](images/example.png)
+
+### Temperature
+
+`temperature.json`: changes 100 degrees Celsius to Fahrenheit (F = C × 1.8 + 32). Format Text puts the two numbers into one line of text: `100.0 Celsius = 212.0 Fahrenheit`.
+
+![The temperature graph](images/temperature.png)
+
+### Word count
+
+`word_count.json`: one Text node sends its value to two places. Upper Case changes the text to capital letters. Split Text cuts the text into words, and Length counts the words. The `then` output of the first Print node starts the second Print node.
+
+![The word count graph](images/word_count.png)
+
+### Pass or fail
+
+`pass_or_fail.json`: Compare checks if the score (72) is 50 or more. Branch then runs only one of the two Print nodes. The "Fail" Print node did not run, so its status square stays orange. Change the score to 40 and run the graph again.
+
+![The pass or fail graph](images/pass_or_fail.png)
+
+### Times table
+
+`times_table.json`: For Loop runs the nodes at `loop body` 10 times, with `index` from 1 to 10. Each time, Multiply and Format Text make a new line, and Log adds the line. Multiply runs again each time, because `index` changes.
+
+![The times table graph](images/times_table.png)
+
+### Two dice
+
+`dice.json`: Sequence runs its exec outputs in order: the first die, the second die, then Log. Random Integer is an exec node, so each run gives new numbers. Click **Run** on the Button node to roll again.
+
+![The two dice graph](images/dice.png)
+
+### Shopping list
+
+`shopping_list.json`: Split Text cuts the text at each comma, and Sort puts the items in order from A to Z. For Each runs `loop body` one time for each item. Then `completed` runs the Print node, which shows the number of items.
+
+![The shopping list graph](images/shopping_list.png)
 
 ## How the code works
 
