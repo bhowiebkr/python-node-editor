@@ -58,10 +58,12 @@ def run_from(graph: Graph, start: Node) -> None:
 def run_exec_output(graph: Graph, node: Node, name: str) -> None:
     """Run the nodes that connect to the exec output `name` of `node`."""
     # An exec node can give new values each time it runs (for example, the index of a loop).
-    # Mark the nodes that use its values as dirty, so that they run again with the new values.
-    for pin in node.data_outputs:
-        for connection in graph.connections_of(pin):
-            graph.mark_dirty(connection.end.node)
+    # If it set new values, mark the nodes that use them as dirty, so that they run again.
+    if node.outputs_changed:
+        node.outputs_changed = False
+        for pin in node.data_outputs:
+            for connection in graph.connections_of(pin):
+                graph.mark_dirty(connection.end.node)
 
     for connection in graph.connections_of(node.pin(name)):
         run_from(graph, connection.end.node)

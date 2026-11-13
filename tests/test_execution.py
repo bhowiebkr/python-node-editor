@@ -159,6 +159,9 @@ def test_node_can_run_an_exec_output_many_times() -> None:
 
     assert log == [10, 11, 12, None]
     assert repeat.status is Status.CLEAN
+    # "done" did not change the index, so the nodes in the loop body stay clean.
+    assert total.status is Status.CLEAN
+    assert body.status is Status.CLEAN
 
 
 def test_new_value_from_an_exec_node_makes_its_users_run_again() -> None:

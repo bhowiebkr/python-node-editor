@@ -60,6 +60,7 @@ class Node:
         self.status = Status.DIRTY
         self.error = ""  # The error message when the status is ERROR.
         self.chose_exec_output = False  # True after compute() calls run_exec_output().
+        self.outputs_changed = False  # True after set_output(). See execution.run_exec_output().
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}(id={self.id})"
@@ -125,6 +126,7 @@ class Node:
     def set_output(self, name: str, value: Any) -> None:
         """Set the value of an output pin. Use this in compute()."""
         self.pin(name).value = value
+        self.outputs_changed = True
 
     def run_exec_output(self, name: str) -> None:
         """Run the nodes that connect to the exec output `name`, now. Use this in compute().

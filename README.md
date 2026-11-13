@@ -155,7 +155,7 @@ After an exec node runs, `run_from` usually follows all of its exec outputs. But
 - **Branch** runs only `true` or only `false`.
 - **For Loop** runs `loop body` one time for each number, with a new `index` each time. Then it runs `completed`.
 
-Before an exec output runs, `run_exec_output` marks the nodes that use the values of the node as dirty. Thus a pure node that uses `index` runs again for each new index.
+If the node set new output values, `run_exec_output` first marks the nodes that use these values as dirty. Thus a pure node that uses `index` runs again for each new index.
 
 ## Make your own node
 
