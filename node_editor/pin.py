@@ -1,66 +1,42 @@
+"""A pin is an input or an output on a node."""
+
 from __future__ import annotations
 
-from typing import Any
-from typing import Optional
+from typing import TYPE_CHECKING, Any
 
-from node_editor.gui.pin_graphics import Pin_Graphics
+if TYPE_CHECKING:
+    from node_editor.node import Node
 
 
-class Pin(Pin_Graphics):
-    def __init__(self, parent: Any, scene: Any) -> None:
-        super().__init__(parent, scene)
+class Pin:
+    """One input or one output of a node.
 
-        self.name: str = ""
-        self.node: Optional[Any] = None
-        self.connection: Optional[Any] = None
-        self.execution: bool = False
+    There are two kinds of pins:
 
-    def set_execution(self, execution: bool) -> None:
-        self.execution = execution
-        super().set_execution(execution)
+    - A data pin carries a value (for example a number) from an output to an input.
+    - An exec pin carries no value. An exec connection tells which node runs next.
+    """
 
-    def set_name(self, name: str) -> None:
-        self.name = name
-        super().set_name(name)
+    def __init__(self, node: Node, name: str, is_output: bool, is_exec: bool = False, default: Any = None) -> None:
+        self.node = node  # The node that owns this pin.
+        self.name = name  # Unique in the node. Graph files use the name to find the pin.
+        self.is_output = is_output
+        self.is_exec = is_exec
+        self.default = default  # The value of an input that has no connection.
+        self.value: Any = default  # The value now. A run of the graph sets it.
 
-    def clear_connection(self) -> None:
-        if self.connection:
-            self.connection.delete()
+    def __repr__(self) -> str:
+        return f"Pin({self.node!r}, {self.name!r})"
 
-    def can_connect_to(self, pin: Optional[Pin]) -> bool:
-        if not pin:
-            return False
-        if pin.node == self.node:
-            return False
+    @property
+    def allows_many_connections(self) -> bool:
+        """Return True if more than one connection can use this pin.
 
-        return self.is_output != pin.is_output
-
-    def is_connected(self) -> bool:
-        return bool(self.connection)
-
-    def get_data(self) -> Any:
-        pass
-        # Get a list of nodes in the order to be computed. Forward evaluation by default.
-        # def get_node_compute_order(node, forward=False):
-        # Create a set to keep track of visited nodes
-        # visited = set()
-        # Create a stack to keep track of nodes to visit
-        # stack = [node]
-        # Create a list to store the evaluation order
-        # order = []
-
-        # Get the next nodes that this node is dependent on
-        # def get_next_input_node(node):
-        #   pass
-
-        # Get the next nodes that is affected by the input node.
-        # def get_next_output_node(node):
-        #    pass
-
-        # if pin isn't connected, return it current data
-
-        # get the evalutation order of the owning node of the pin
-
-        # loop over each node and process it
-
-        # return the pin's data
+        - A data output can send its value to many inputs.
+        - A data input gets its value from one output only.
+        - An exec output goes to one next node only.
+        - An exec input can come from many nodes.
+        """
+        if self.is_exec:
+            return not self.is_output
+        return self.is_output
