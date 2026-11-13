@@ -36,7 +36,7 @@
             "id": 5,
             "type": "IntegerNode",
             "x": -330,
-            "y": -40,
+            "y": -60,
             "state": {
                 "value": 7
             }
@@ -44,15 +44,15 @@
         {
             "id": 6,
             "type": "MultiplyNode",
-            "x": -170,
-            "y": -60,
+            "x": -150,
+            "y": 40,
             "state": {}
         },
         {
             "id": 7,
             "type": "FormatTextNode",
-            "x": 0,
-            "y": -60,
+            "x": 40,
+            "y": -150,
             "state": {
                 "template": "{a} x {b} = {c}"
             }
@@ -60,7 +60,7 @@
         {
             "id": 8,
             "type": "LogNode",
-            "x": 280,
+            "x": 300,
             "y": -220,
             "state": {}
         }
