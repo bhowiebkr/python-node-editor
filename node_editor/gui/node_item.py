@@ -16,13 +16,13 @@ from node_editor.pin import Pin
 
 TITLE_HEIGHT = 38  # The height of the title bar.
 ROW_HEIGHT = 22  # The height of one row of pins.
-PIN_X = 10  # The distance from the side of the node to the center of a pin.
-LABEL_X = 22  # The distance from the side of the node to a pin label.
+LABEL_X = 12  # The distance from the side of the node to a pin label. The pins are on the sides.
 LABEL_GAP = 24  # The smallest space between an input label and an output label.
 MARGIN = 10
 CORNER = 5  # The radius of the round corners.
 
-BODY_COLOR = QColor(20, 20, 20, 200)
+BODY_COLOR = QColor(28, 28, 28)  # Opaque, so that the connections behind the node do not show.
+OUTLINE_COLOR = QColor(12, 12, 12)
 STATUS_COLORS = {
     Status.DIRTY: QColor(255, 165, 0),
     Status.CLEAN: QColor(0, 200, 0),
@@ -38,14 +38,15 @@ class NodeItem(QGraphicsItem):
         +------------------------------+
         | Title                    [#] |  title bar and status square
         | Category                     |
-        |> exec                  then >|  exec pins
-        |o a                   result o|  data pins
-        |o b                           |
+        >  exec                  then  >  exec pins
+        o  a                   result  o  data pins
+        o  b                           |
         |   [widget]                   |  widget (optional)
         +------------------------------+
 
-    Inputs are at the left side and outputs are at the right side. The position of the
-    item is the top-left corner of the node.
+    Inputs are on the left side and outputs are on the right side. The center of each pin is
+    on the side of the node, so that the connections touch the pins. The position of the item
+    is the top-left corner of the node.
     """
 
     def __init__(self, node: Node, on_move: Callable[[Node], None]) -> None:
@@ -107,10 +108,10 @@ class NodeItem(QGraphicsItem):
             y = TITLE_HEIGHT + row * ROW_HEIGHT + ROW_HEIGHT / 2
             if left is not None:
                 self.pin_items[left] = PinItem(left, parent=self)
-                self.pin_items[left].setPos(PIN_X, y)
+                self.pin_items[left].setPos(0, y)
             if right is not None:
                 self.pin_items[right] = PinItem(right, parent=self)
-                self.pin_items[right].setPos(width - PIN_X, y)
+                self.pin_items[right].setPos(width, y)
 
     def refresh(self) -> None:
         """Show the new status of the node. The scene calls this after each change to the graph."""
@@ -126,21 +127,20 @@ class NodeItem(QGraphicsItem):
         width = self.rect.width()
         title_color = QColor(*self.node.color)
 
-        # The body.
-        painter.setPen(BODY_COLOR.lighter())
-        painter.setBrush(BODY_COLOR)
-        painter.drawRoundedRect(self.rect, CORNER, CORNER)
+        # The body: a rectangle with round corners.
+        outline = QPainterPath()
+        outline.addRoundedRect(self.rect, CORNER, CORNER)
+        painter.fillPath(outline, BODY_COLOR)
 
-        # The title bar: round corners at the top, square corners at the bottom.
-        title_path = QPainterPath()
-        title_path.addRoundedRect(QRectF(0, 0, width, TITLE_HEIGHT), CORNER, CORNER)
-        title_path.addRect(QRectF(0, TITLE_HEIGHT - CORNER, width, CORNER))
+        # The title bar: the top part of the body, so it has the same round corners at the top.
+        title_rect = QPainterPath()
+        title_rect.addRect(QRectF(0, 0, width, TITLE_HEIGHT))
         gradient = QLinearGradient(0, 0, 0, TITLE_HEIGHT)
         gradient.setColorAt(0, title_color)
         gradient.setColorAt(1, title_color.darker())
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(gradient)
-        painter.drawPath(title_path.simplified())
+        painter.fillPath(outline.intersected(title_rect), gradient)
+
+        painter.strokePath(outline, QPen(OUTLINE_COLOR, 1))
 
         # The title and the category.
         painter.setPen(Qt.GlobalColor.white)
@@ -167,9 +167,7 @@ class NodeItem(QGraphicsItem):
 
         # The outline of a selected node.
         if self.isSelected():
-            painter.setPen(QPen(title_color.lighter(), 2))
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.drawRoundedRect(self.rect, CORNER, CORNER)
+            painter.strokePath(outline, QPen(title_color.lighter(), 2))
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value: Any) -> Any:
         if change == QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged:
