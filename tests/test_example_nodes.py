@@ -258,3 +258,16 @@ def test_counter_counts_its_runs() -> None:
     counter = make("CounterNode")
     assert outputs(counter) == {"count": 1}
     assert outputs(counter) == {"count": 2}
+
+
+# --- Debug ---
+
+
+def test_log_keeps_each_value_until_clear() -> None:
+    log = make("LogNode")
+    outputs(log, value=1)
+    outputs(log, value="two")
+    assert log.lines == ["1", "two"]  # type: ignore[attr-defined]
+
+    log.clear()  # type: ignore[attr-defined]
+    assert log.lines == []  # type: ignore[attr-defined]
