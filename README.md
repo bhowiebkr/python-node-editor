@@ -51,7 +51,7 @@ The editor opens `example_project/example.json`. Click **Run Graph**. The Print 
 | Move a node | Drag the node. |
 | Zoom | Turn the mouse wheel. |
 | Pan | Drag with the middle mouse button. |
-| Run | Click **Run Graph**, or click **Run** on the Button node. |
+| Run | Click **Run Graph** at the top, press F5, or click **Run** on the Button node. |
 | Save and open | Use the **File** menu. |
 
 The square at the top right of each node shows its status:
@@ -104,14 +104,14 @@ Because of this, the items on the screen always agree with the graph.
 | `node_editor/graph.py` | `Graph`: the nodes, the connections, the connection rules, save and open. |
 | `node_editor/execution.py` | Runs the graph. Start here to learn the run order. |
 | `node_editor/loader.py` | Finds the node classes in a folder. |
-| `node_editor/gui/main_window.py` | The window, the File menu and the Run Graph button. |
+| `node_editor/gui/main_window.py` | The window: the toolbar (File menu, Run Graph and messages) and the node list panel. |
 | `node_editor/gui/scene.py` | Shows the graph. Drag to connect, and Delete to remove. |
 | `node_editor/gui/view.py` | Zoom, pan, the grid, and drop from the node list. |
 | `node_editor/gui/node_item.py` | Draws a node. |
 | `node_editor/gui/pin_item.py` | Draws a pin. |
 | `node_editor/gui/connection_item.py` | Draws a connection as a curve. |
 | `node_editor/gui/node_list.py` | The list of node types at the left side. |
-| `node_editor/gui/theme.py` | The dark colors. |
+| `node_editor/gui/theme.py` | The dark colors and the style sheet. |
 | `example_project/` | The example nodes and the example graph. |
 | `tests/` | The tests. |
 

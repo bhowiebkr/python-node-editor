@@ -19,9 +19,51 @@ COLORS = {
     QPalette.ColorRole.HighlightedText: QColor(255, 255, 255),
 }
 
+# A Qt style sheet works like CSS. "#Name" finds the widget with that object name.
+STYLE_SHEET = """
+#ToolBar {
+    background: #1f1f1f;
+    border: none;
+    border-bottom: 1px solid #141414;
+    padding: 4px;
+    spacing: 6px;
+}
+#ToolBar QToolButton {
+    background: transparent;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+}
+#ToolBar QToolButton:hover {
+    background: #3a3a3a;
+}
+#ToolBar QToolButton::menu-indicator {
+    image: none;
+}
+#ToolBar #RunButton {
+    background: #2e7d32;
+    color: white;
+    font-weight: bold;
+}
+#ToolBar #RunButton:hover {
+    background: #388e3c;
+}
+#ToolBar #RunButton:pressed {
+    background: #1b5e20;
+}
+QMenu {
+    border: 1px solid #141414;
+    padding: 4px 0;
+}
+#Message {
+    color: #a0a0a0;
+    padding-right: 8px;
+}
+"""
+
 
 def apply_dark_theme(app: QApplication) -> None:
-    """Use the Fusion style with dark colors.
+    """Use the Fusion style with dark colors, and the style sheet.
 
     Fusion looks the same on Windows, macOS and Linux. The palette also gives dark colors
     to the widgets inside the nodes.
@@ -33,3 +75,4 @@ def apply_dark_theme(app: QApplication) -> None:
     palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Text, QColor(127, 127, 127))
     palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.ButtonText, QColor(127, 127, 127))
     app.setPalette(palette)
+    app.setStyleSheet(STYLE_SHEET)

@@ -9,7 +9,7 @@ import pytest
 from PySide6.QtCore import QMimeData, QPoint, QPointF, Qt
 from PySide6.QtGui import QDropEvent
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QDoubleSpinBox, QFileDialog, QPushButton
+from PySide6.QtWidgets import QDoubleSpinBox, QFileDialog, QPushButton, QToolButton
 from pytestqt.qtbot import QtBot
 
 from node_editor.gui.main_window import MainWindow
@@ -66,6 +66,27 @@ def test_button_node_runs_the_graph(window: MainWindow) -> None:
     assert isinstance(button, QPushButton)
     button.click()
     assert nodes_of_type(window, "PrintNode")[0].label.text() == "5.0"
+
+
+def test_run_graph_button_in_the_toolbar_runs_the_graph(window: MainWindow) -> None:
+    run_button = window.findChild(QToolButton, "RunButton")
+    assert isinstance(run_button, QToolButton)
+    run_button.click()
+    assert nodes_of_type(window, "PrintNode")[0].label.text() == "5.0"
+    assert window.message.text() == "The run is complete."
+
+
+def test_file_shortcut_works_when_the_menu_is_closed(window: MainWindow, qtbot: QtBot) -> None:
+    window.activateWindow()
+    qtbot.waitActive(window)
+    QTest.keyClick(window, Qt.Key.Key_N, Qt.KeyboardModifier.ControlModifier)
+    assert window.graph.nodes == []
+
+
+def test_message_with_a_time_goes_away(window: MainWindow, qtbot: QtBot) -> None:
+    window.show_message("Saved", 10)
+    assert window.message.text() == "Saved"
+    qtbot.waitUntil(lambda: window.message.text() == "")
 
 
 def test_new_value_in_scalar_marks_the_add_node_dirty(window: MainWindow) -> None:
@@ -217,4 +238,4 @@ def test_error_shows_in_the_tooltip(window: MainWindow) -> None:
     fail = window.graph.add_node(FailNode())
     window.run_graph()
     assert window.scene.node_items[fail].toolTip() == "boom"
-    assert "errors in 1 nodes" in window.statusBar().currentMessage()
+    assert "errors in 1 nodes" in window.message.text()

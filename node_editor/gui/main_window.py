@@ -5,16 +5,18 @@ from __future__ import annotations
 from collections.abc import Callable
 from pathlib import Path
 
-from PySide6.QtCore import QPointF, QSettings
+from PySide6.QtCore import QPointF, QSettings, Qt, QTimer
 from PySide6.QtGui import QAction, QCloseEvent, QKeySequence
 from PySide6.QtWidgets import (
     QFileDialog,
+    QLabel,
     QMainWindow,
     QMenu,
     QMessageBox,
-    QPushButton,
+    QSizePolicy,
     QSplitter,
-    QVBoxLayout,
+    QToolBar,
+    QToolButton,
     QWidget,
 )
 
@@ -30,7 +32,10 @@ FILE_FILTER = "Graph files (*.json)"
 
 
 class MainWindow(QMainWindow):
-    """The node list and the Run Graph button at the left side, and the node view at the right side."""
+    """The toolbar at the top, the node list at the left side, and the node view at the right side.
+
+    The style sheet in theme.py gives the colors. It finds the widgets by their object names.
+    """
 
     def __init__(self, nodes_folder: Path, start_file: Path | None = None) -> None:
         super().__init__()
@@ -42,24 +47,15 @@ class MainWindow(QMainWindow):
         self.view = NodeView(self.scene)
         self.view.node_dropped.connect(self.add_node)
         self.node_list = NodeList(self.node_classes)
-        run_button = QPushButton("Run Graph")
-        run_button.setFixedHeight(40)
-        run_button.clicked.connect(self.run_graph)
-
-        left_side = QWidget()
-        left_layout = QVBoxLayout(left_side)
-        left_layout.setContentsMargins(0, 0, 0, 0)
-        left_layout.addWidget(self.node_list)
-        left_layout.addWidget(run_button)
 
         self.splitter = QSplitter()
-        self.splitter.addWidget(left_side)
+        self.splitter.addWidget(self.node_list)
         self.splitter.addWidget(self.view)
         self.splitter.setStretchFactor(1, 1)
         self.splitter.setSizes([200, 1000])
         self.setCentralWidget(self.splitter)
 
-        self._make_file_menu()
+        self._make_toolbar()
         self._restore_window_state()
 
         if start_file is not None:
@@ -67,14 +63,45 @@ class MainWindow(QMainWindow):
         else:
             self._update_title()
 
-    def _make_file_menu(self) -> None:
-        menu = self.menuBar().addMenu("&File")
+    def _make_toolbar(self) -> None:
+        """Make one row at the top: the File menu, the Run Graph button and the messages."""
+        menu = QMenu(self)
         self._add_action(menu, "&New", "Ctrl+N", self.new_file)
         self._add_action(menu, "&Open...", "Ctrl+O", self.choose_file_to_open)
         self._add_action(menu, "&Save", "Ctrl+S", self.save)
         self._add_action(menu, "Save &As...", "Ctrl+Shift+S", self.save_as)
         menu.addSeparator()
         self._add_action(menu, "&Quit", "Ctrl+Q", self.close)
+        file_button = QToolButton()
+        file_button.setText("&File")
+        file_button.setMenu(menu)
+        file_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+
+        run_action = QAction("Run Graph", self)
+        run_action.setShortcut(QKeySequence("F5"))
+        run_action.setToolTip("Run the graph (F5)")
+        run_action.triggered.connect(self.run_graph)
+        run_button = QToolButton()
+        run_button.setObjectName("RunButton")
+        run_button.setDefaultAction(run_action)
+
+        spacer = QWidget()  # Pushes the messages to the right side.
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self.message = QLabel()
+        self.message.setObjectName("Message")
+        self.message_timer = QTimer(self)
+        self.message_timer.setSingleShot(True)
+        self.message_timer.timeout.connect(self.message.clear)
+
+        toolbar = QToolBar()
+        toolbar.setObjectName("ToolBar")
+        toolbar.setMovable(False)
+        toolbar.setContextMenuPolicy(Qt.ContextMenuPolicy.PreventContextMenu)  # This menu can hide the toolbar.
+        toolbar.addWidget(file_button)
+        toolbar.addWidget(run_button)
+        toolbar.addWidget(spacer)
+        toolbar.addWidget(self.message)
+        self.addToolBar(toolbar)
 
     def _add_action(self, menu: QMenu, text: str, shortcut: str, function: Callable[[], object]) -> None:
         action = QAction(text, self)
@@ -94,9 +121,17 @@ class MainWindow(QMainWindow):
         run_graph(self.graph)
         errors = [node for node in self.graph.nodes if node.status is Status.ERROR]
         if errors:
-            self.statusBar().showMessage(f"The run has errors in {len(errors)} nodes. Put the mouse on a red node.")
+            self.show_message(f"The run has errors in {len(errors)} nodes. Put the mouse on a red node.")
         else:
-            self.statusBar().showMessage("The run is complete.", 3000)
+            self.show_message("The run is complete.", 3000)
+
+    def show_message(self, text: str, milliseconds: int = 0) -> None:
+        """Show a message at the right side of the toolbar. If `milliseconds` is not 0, remove it after that time."""
+        self.message.setText(text)
+        if milliseconds:
+            self.message_timer.start(milliseconds)
+        else:
+            self.message_timer.stop()
 
     # --- Files ---
 
@@ -139,7 +174,7 @@ class MainWindow(QMainWindow):
             return
         self.file_path = path
         self._update_title()
-        self.statusBar().showMessage(f"Saved {path.name}", 3000)
+        self.show_message(f"Saved {path.name}", 3000)
 
     def _dialog_folder(self) -> str:
         return str(self.file_path.parent) if self.file_path else ""
