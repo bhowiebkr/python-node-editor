@@ -94,3 +94,31 @@ def test_random_integer_is_from_minimum_to_maximum() -> None:
     node = make("RandomIntegerNode")
     values = {outputs(node, minimum=1, maximum=3)["value"] for _ in range(100)}
     assert values == {1, 2, 3}
+
+
+# --- Logic ---
+
+
+@pytest.mark.parametrize(
+    ("comparison", "expected"),
+    [("==", False), ("!=", True), ("<", True), ("<=", True), (">", False), (">=", False)],
+)
+def test_compare_uses_the_selected_comparison(comparison: str, expected: bool) -> None:
+    node = make("CompareNode", comparison=comparison)
+    assert outputs(node, a=2, b=3) == {"result": expected}
+
+
+@pytest.mark.parametrize(
+    ("class_name", "inputs", "expected"),
+    [
+        ("AndNode", {"a": True, "b": True}, True),
+        ("AndNode", {"a": True, "b": False}, False),
+        ("OrNode", {"a": False, "b": True}, True),
+        ("OrNode", {"a": False, "b": False}, False),
+        ("NotNode", {"value": True}, False),
+        ("SelectNode", {"condition": True, "if true": "yes", "if false": "no"}, "yes"),
+        ("SelectNode", {"condition": False, "if true": "yes", "if false": "no"}, "no"),
+    ],
+)
+def test_logic_node_gives_the_result(class_name: str, inputs: dict[str, Any], expected: Any) -> None:
+    assert outputs(make(class_name), **inputs) == {"result": expected}
