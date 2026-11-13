@@ -26,7 +26,7 @@ class PrintNode(Node):
 
     def create_widget(self) -> QLabel:
         self.label = QLabel("(not run)")
-        self.label.setMinimumWidth(120)
+        self.label.setFixedWidth(200)
         return self.label
 
     def compute(self) -> None:
@@ -34,6 +34,7 @@ class PrintNode(Node):
         print(f"Print: {value}")
         if self.label is not None:
             self.label.setText(str(value))
+            self.label.setToolTip(str(value))  # Shows all of a long value.
 
 
 class LogNode(Node):
